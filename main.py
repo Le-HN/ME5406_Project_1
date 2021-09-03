@@ -9,7 +9,7 @@ if __name__ == '__main__':
     robot_li = agent.robot()
 
     return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))
-    for iteration in range(0, 50000):
+    for iteration in range(0, 20000):
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
