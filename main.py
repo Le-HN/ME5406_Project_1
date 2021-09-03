@@ -1,85 +1,39 @@
-import env_for_p1.envs.lirobot as lr
-import parameters as param
-import numpy as np
-import agent
+import tkinter as tk
+import tkinter.messagebox
+import os
 
 
-if __name__ == '__main__':
-    env = lr.LiRobot()
-    robot_li = agent.robot()
+# 定义一个函数功能（内容自己自由编写），供点击Button按键时调用，调用命令参数command=函数名
+def open_MC_V():
+    tkinter.messagebox.showinfo(title='Note', message='Monte Carlo (state value) will be activated.')
+    os.system("python monte_carlo_V.py")
 
-    return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))
-    for iteration in range(0, 20000):
-        # prediction
-        # robot initialization
-        robot_li.obser, robot_li.pos = env.reset()
-        G = 0
-        robot_li.sample_list = [[1, 1]]
-        done = False
-        while not done:
-            # randomly choose the action according to the possibility of each state
-            index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
-            done, robot_li.pos, reward = env.step(index)                # do a action and get the reward and state
-            if robot_li.pos not in robot_li.sample_list:
-                robot_li.sample_list.append(list(robot_li.pos))
-        G = reward
-        x = robot_li.sample_list[-1][0]
-        y = robot_li.sample_list[-1][1]
-        return_saving[x][y] += G
-        robot_li.sample_num[x][y] += 1
-        for j in range(len(robot_li.sample_list)-2, -1, -1):
-            x = robot_li.sample_list[j][0]
-            y = robot_li.sample_list[j][1]
-            G = param.AGENT_ACTION.ACTION_REWARD + param.AGENT_ACTION.DISCOUNT_FACTOR * G
-            return_saving[x][y] += G
-            robot_li.sample_num[x][y] += 1
+def open_MC_Q():
+    tkinter.messagebox.showinfo(title='Note', message='Monte Carlo (state-action value) will be activated.')
+    os.system("python monte_carlo_Q.py")
 
-        # calculate the expectation of the state value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-                if not return_saving[i][j] == 0:
-                    robot_li.value[i][j] = return_saving[i][j] / robot_li.sample_num[i][j]
 
-        print(iteration)
-        # print(robot_li.value)
-        # print(robot_li.sample_num)
+if __name__ == "__main__":
+    # 第1步，实例化object，建立窗口window
+    window = tk.Tk()
 
-        # control
-        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-                next_value_list = [robot_li.value[i][j + 1],
-                                   robot_li.value[i + 1][j],
-                                   robot_li.value[i][j - 1],
-                                   robot_li.value[i - 1][j]]
-                action_index = next_value_list.index(max(next_value_list))
-                if 0 not in next_value_list:
-                    for k in range(0, 4):
-                        if action_index == k:
-                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON
-                        else:
-                            robot_li.probs[i][j][k] = (1 - param.AGENT_ACTION.EPSILON) / 3
-                else:
-                    # continue
-                    action_index = next_value_list.index(0)
-                    for k in range(0, 4):
-                        if action_index == k:
-                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON
-                        else:
-                            robot_li.probs[i][j][k] = (1 - param.AGENT_ACTION.EPSILON) / 3
-                # for k in range(0, 4):
-                #     if action_index == k:
-                #         robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON
-                #     else:
-                #         robot_li.probs[i][j][k] = (1 - param.AGENT_ACTION.EPSILON) / 3
+    # 第2步，给窗口的可视化起名字
+    window.title('Frozen Lake')
 
-        # calculate the value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-                if not robot_li.value[i][j] == 0:
-                    param.ENV_SETTINGS.VALUE_ARRAY[i][j] = robot_li.value[i][j]
-                else:
-                    param.ENV_SETTINGS.VALUE_ARRAY[i][j] = 0
-        np.set_printoptions(linewidth=400)
-        print(param.ENV_SETTINGS.VALUE_ARRAY)
-    print(env.world)
+    # 第3步，设定窗口的大小(长 * 宽)
+    window.geometry('900x600')  # 这里的乘是小x
 
+    # 第4步，在图形界面上设定标签
+    var = tk.StringVar()  # 将label标签的内容设置为字符类型，用var来接收hit_me函数的传出内容用以显示在标签上
+    l = tk.Label(window, textvariable=var, bg='green', fg='white', font=('Arial', 12), width=30, height=2)
+    # 说明： bg为背景，fg为字体颜色，font为字体，width为长，height为高，这里的长和高是字符的长和高，比如height=2,就是标签有2个字符这么高
+    l.pack()
+
+    # 第5步，在窗口界面设置放置Button按键
+    mcv_b = tk.Button(window, text='Monte Carlo V', font=('Arial', 12), width=14, height=3, command=open_MC_V)
+    mcv_b.pack()
+    mcq_b= tk.Button(window, text='Monte Carlo Q', font=('Arial', 12), width=14, height=3, command=open_MC_Q)
+    mcq_b.pack()
+
+    # 第6步，主窗口循环显示
+    window.mainloop()

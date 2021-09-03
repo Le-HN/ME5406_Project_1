@@ -11,7 +11,8 @@ class LiRobot(gym.Env):
         if param.ENV_SETTINGS.MATRIX_SIZE == 6:
             self.world = param.ENV_SETTINGS.FOUR_BY_FOUR
         else:
-            self.world = self.generate_ten_by_ten()
+            # self.world = self.generate_ten_by_ten()
+            self.world = param.ENV_SETTINGS.TEN_BY_TEN
         self.observation_space = self.world
         self.action_space = param.AGENT_ACTION.ACTION_SPACE
         self.agent_pos = [1, 1]

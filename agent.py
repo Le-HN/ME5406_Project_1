@@ -4,9 +4,15 @@ import parameters as param
 
 class robot():
     def __init__(self):
+
         self.value = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))
         self.sample_num = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))
+
+        self.value_Q = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE, 4))
+        self.sample_num_Q = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE, 4))
+
         self.sample_list = [[1, 1]]
+        self.action_list = []
         self.probs = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE, 4))
         self.pos = []
         self.obser = None
