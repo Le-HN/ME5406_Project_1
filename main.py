@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # 第5步，在窗口界面设置放置Button按键
     mcv_b = tk.Button(window, text='Monte Carlo V', font=('Arial', 12), width=14, height=3, command=open_MC_V)
     mcv_b.pack()
-    mcq_b= tk.Button(window, text='Monte Carlo Q', font=('Arial', 12), width=14, height=3, command=open_MC_Q)
+    mcq_b = tk.Button(window, text='Monte Carlo Q', font=('Arial', 12), width=14, height=3, command=open_MC_Q)
     mcq_b.pack()
 
     # 第6步，主窗口循环显示

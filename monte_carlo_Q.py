@@ -9,7 +9,7 @@ if __name__ == '__main__':
     robot_li = agent.robot()
 
     return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE, 4))
-    for iteration in range(0, 10000):
+    for iteration in range(0, 20000):
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
@@ -93,6 +93,8 @@ if __name__ == '__main__':
     route = []
     x = robot_li.pos[0]
     y = robot_li.pos[1]
+    sum = 0
+    success = True
     while env.world[x][y] != -1:
         robot_li.pos = [x, y]
         route.append((x, y))
@@ -107,4 +109,13 @@ if __name__ == '__main__':
         x += param.AGENT_ACTION.ACTION_SPACE[direction][0]
         y += param.AGENT_ACTION.ACTION_SPACE[direction][1]
 
-    print(route)
+        sum += 1
+        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE - 2, 2):
+            success = False
+            break
+
+    if success:
+        print(route)
+        print(success)
+    else:
+        print(success)
