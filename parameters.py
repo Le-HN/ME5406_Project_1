@@ -31,4 +31,4 @@ class AGENT_ACTION:
     ACTION_PROB_INT          = 0.25
     ACTION_REWARD            = 0.1
     DISCOUNT_FACTOR          = 0.8
-    EPSILON                  = 0.8
+    EPSILON                  = 0.2

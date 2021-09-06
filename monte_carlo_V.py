@@ -55,17 +55,17 @@ if __name__ == '__main__':
                 if 0 not in next_value_list:
                     for k in range(0, 4):
                         if action_index == k:
-                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON
+                            robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
                         else:
-                            robot_li.probs[i][j][k] = (1 - param.AGENT_ACTION.EPSILON) / 3
+                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
                 else:
                     # continue
                     action_index = next_value_list.index(0)
                     for k in range(0, 4):
                         if action_index == k:
-                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON
+                            robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
                         else:
-                            robot_li.probs[i][j][k] = (1 - param.AGENT_ACTION.EPSILON) / 3
+                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
                 # for k in range(0, 4):
                 #     if action_index == k:
                 #         robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON
