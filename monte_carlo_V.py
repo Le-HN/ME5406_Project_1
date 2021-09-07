@@ -9,20 +9,24 @@ if __name__ == '__main__':
     robot_li = agent.robot()
 
     return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))
-    for iteration in range(0, 20000):
+    for iteration in range(0, 16000):
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
         G = 0
+        reward = 0
         robot_li.sample_list = [[1, 1]]
         done = False
         while not done:
             # randomly choose the action according to the possibility of each state
-            index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
-            done, robot_li.pos, reward = env.step(index)                # do a action and get the reward and state
+            while reward == 0:
+                index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
+                done, robot_li.pos, reward = env.step(index)                # do a action and get the reward and state
             if robot_li.pos not in robot_li.sample_list:
                 robot_li.sample_list.append(list(robot_li.pos))
-        G = reward
+            G = reward
+            reward = 0
+
         x = robot_li.sample_list[-1][0]
         y = robot_li.sample_list[-1][1]
         return_saving[x][y] += G
@@ -52,25 +56,11 @@ if __name__ == '__main__':
                                    robot_li.value[i][j - 1],
                                    robot_li.value[i - 1][j]]
                 action_index = next_value_list.index(max(next_value_list))
-                if 0 not in next_value_list:
-                    for k in range(0, 4):
-                        if action_index == k:
-                            robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
-                        else:
-                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
-                else:
-                    # continue
-                    action_index = next_value_list.index(0)
-                    for k in range(0, 4):
-                        if action_index == k:
-                            robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
-                        else:
-                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
-                # for k in range(0, 4):
-                #     if action_index == k:
-                #         robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON
-                #     else:
-                #         robot_li.probs[i][j][k] = (1 - param.AGENT_ACTION.EPSILON) / 3
+                for k in range(0, 4):
+                    if action_index == k:
+                        robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
+                    else:
+                        robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
 
         # calculate the value
         for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
@@ -89,7 +79,7 @@ if __name__ == '__main__':
     y = robot_li.pos[1]
     sum = 0
     success = True
-    while env.world[x][y] != 1:
+    while env.world[x][y] == 0:
         robot_li.pos = [x, y]
         route.append((x, y))
         x = robot_li.pos[0]
@@ -107,10 +97,11 @@ if __name__ == '__main__':
         if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE-2, 2):
             success = False
             break
-
-    route.append((4, 4))
+    route.append((x, y))
+    if env.world[x][y] != 1:
+        success = False
     if success:
         print(route)
-        print(success)
+        print("Monte Carlo V: ", success)
     else:
-        print(success)
+        print("Monte Carlo V: ", success)

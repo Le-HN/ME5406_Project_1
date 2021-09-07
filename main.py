@@ -8,9 +8,21 @@ def open_MC_V():
     tkinter.messagebox.showinfo(title='Note', message='Monte Carlo (state value) will be activated.')
     os.system("python monte_carlo_V.py")
 
+
 def open_MC_Q():
     tkinter.messagebox.showinfo(title='Note', message='Monte Carlo (state-action value) will be activated.')
     os.system("python monte_carlo_Q.py")
+
+
+def open_SARSA():
+    tkinter.messagebox.showinfo(title='Note', message='SARSA will be activated.')
+    os.system("python sarsa_Q.py")
+
+
+def open_QL():
+    tkinter.messagebox.showinfo(title='Note', message='Q Learning will be activated.')
+    os.system("python q_learning.py")
+
 
 
 if __name__ == "__main__":
@@ -33,6 +45,10 @@ if __name__ == "__main__":
     mcv_b = tk.Button(window, text='Monte Carlo V', font=('Arial', 12), width=14, height=3, command=open_MC_V)
     mcv_b.pack()
     mcq_b = tk.Button(window, text='Monte Carlo Q', font=('Arial', 12), width=14, height=3, command=open_MC_Q)
+    mcq_b.pack()
+    mcq_b = tk.Button(window, text='SARSA', font=('Arial', 12), width=14, height=3, command=open_SARSA)
+    mcq_b.pack()
+    mcq_b = tk.Button(window, text='Q Learning', font=('Arial', 12), width=14, height=3, command=open_QL)
     mcq_b.pack()
 
     # 第6步，主窗口循环显示

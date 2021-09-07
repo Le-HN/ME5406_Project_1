@@ -21,8 +21,13 @@ class LiRobot(gym.Env):
         pre_pos = self.agent_pos
         self.agent_pos[0] += param.AGENT_ACTION.ACTION_SPACE[action_index][0]
         self.agent_pos[1] += param.AGENT_ACTION.ACTION_SPACE[action_index][1]
+        if self.observation_space[self.agent_pos[0], self.agent_pos[1]] == -2:
+            self.agent_pos[0] -= param.AGENT_ACTION.ACTION_SPACE[action_index][0]
+            self.agent_pos[1] -= param.AGENT_ACTION.ACTION_SPACE[action_index][1]
+            reward = 0
+            done = False
+            return done, self.agent_pos, reward
         if self.observation_space[self.agent_pos[0], self.agent_pos[1]] == 1 or \
-                self.observation_space[self.agent_pos[0], self.agent_pos[1]] == -2 or \
                 self.observation_space[self.agent_pos[0], self.agent_pos[1]] == -1:
             reward = self.observation_space[self.agent_pos[0], self.agent_pos[1]]
             done = True
