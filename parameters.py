@@ -32,4 +32,4 @@ class AGENT_ACTION:
     ACTION_REWARD            = 0.1
     DISCOUNT_FACTOR          = 0.8
     EPSILON                  = 0.1
-    L_RATE                   = 0.01
+    L_RATE                   = 0.005

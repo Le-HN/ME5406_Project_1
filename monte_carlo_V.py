@@ -69,9 +69,9 @@ if __name__ == '__main__':
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = robot_li.value[i][j]
                 else:
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = 0
-        np.set_printoptions(linewidth=400)
-        print(param.ENV_SETTINGS.VALUE_ARRAY)
-    print(env.world)
+    #     np.set_printoptions(linewidth=400)
+    #     print(param.ENV_SETTINGS.VALUE_ARRAY)
+    # print(env.world)
 
     robot_li.pos = [1, 1]
     route = []
