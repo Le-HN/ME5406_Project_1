@@ -21,7 +21,7 @@ class ENV_SETTINGS:
                                          [-2, -1,  0,  0,  0,  0,  0, -1,  0,  0,  1, -2],
                                          [-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]])
     TEN_BY_TEN_TEST          = np.zeros((12, 12))
-    MATRIX_SIZE              = 12                                              # map size + walls
+    MATRIX_SIZE              = 12                                              # walls + map size
     VALUE_ARRAY              = np.zeros((MATRIX_SIZE, MATRIX_SIZE))
     STATE_ACTION_VALUE = np.zeros((MATRIX_SIZE, MATRIX_SIZE, 4))
 
@@ -31,5 +31,5 @@ class AGENT_ACTION:
     ACTION_PROB_INT          = 0.25
     ACTION_REWARD            = 0.1
     DISCOUNT_FACTOR          = 0.8
-    EPSILON                  = 0.1
-    L_RATE                   = 0.005
+    EPSILON                  = 0.15
+    L_RATE                   = 0.01

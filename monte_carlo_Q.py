@@ -1,15 +1,19 @@
 import env_for_p1.envs.lirobot as lr
+import tkinter.messagebox
 import parameters as param
 import numpy as np
+import time
 import agent
 
 
-if __name__ == '__main__':
-    env = lr.LiRobot()
+def monte_carlo_q(iteration_lim):
+    successful_num = 0
+    shortest_num = 0
     robot_li = agent.robot()
+    env = lr.LiRobot()
 
     return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE, 4))
-    for iteration in range(0, 200000):
+    for iteration in range(0, iteration_lim):
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
@@ -46,7 +50,7 @@ if __name__ == '__main__':
                     if not return_saving[i][j][k] == 0:
                         robot_li.value_Q[i][j][k] = return_saving[i][j][k] / robot_li.sample_num_Q[i][j][k]
 
-        print(iteration)
+        # print(iteration)
         # print(robot_li.action_list)
         # print(return_saving)
         # print(robot_li.sample_num)
@@ -107,5 +111,21 @@ if __name__ == '__main__':
     if success:
         print(route)
         print("Monte Carlo Q: ", success)
+        successful_num += 1
+        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE - 2) * 2 - 1:
+            shortest_num += 1
     else:
         print("Monte Carlo Q: ", success)
+    return successful_num, shortest_num, env.world, route, env, success
+
+
+if __name__ == '__main__':
+
+    sc_n, st_n, world, route, env, result = monte_carlo_q(iteration_lim=500)
+    if result:
+        for pos in route:
+            if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
+                env.render_4(pos[0], pos[1])
+                time.sleep(0.5)
+    else:
+        tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

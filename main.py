@@ -46,10 +46,10 @@ if __name__ == "__main__":
     mcv_b.pack()
     mcq_b = tk.Button(window, text='Monte Carlo Q', font=('Arial', 12), width=14, height=3, command=open_MC_Q)
     mcq_b.pack()
-    mcq_b = tk.Button(window, text='SARSA', font=('Arial', 12), width=14, height=3, command=open_SARSA)
-    mcq_b.pack()
-    mcq_b = tk.Button(window, text='Q Learning', font=('Arial', 12), width=14, height=3, command=open_QL)
-    mcq_b.pack()
+    sar_b = tk.Button(window, text='SARSA', font=('Arial', 12), width=14, height=3, command=open_SARSA)
+    sar_b.pack()
+    qlr_b = tk.Button(window, text='Q Learning', font=('Arial', 12), width=14, height=3, command=open_QL)
+    qlr_b.pack()
 
     # 第6步，主窗口循环显示
     window.mainloop()

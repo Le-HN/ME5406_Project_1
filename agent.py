@@ -2,7 +2,7 @@ import numpy as np
 import parameters as param
 
 
-class robot():
+class robot:
     def __init__(self):
 
         self.value = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))

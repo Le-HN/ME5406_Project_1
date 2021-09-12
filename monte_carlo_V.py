@@ -1,15 +1,19 @@
 import env_for_p1.envs.lirobot as lr
+import tkinter.messagebox
 import parameters as param
 import numpy as np
+import time
 import agent
 
 
-if __name__ == '__main__':
-    env = lr.LiRobot()
+def monte_carlo_v(iteration_lim):
+    successful_num = 0
+    shortest_num = 0
     robot_li = agent.robot()
+    env = lr.LiRobot()
 
     return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))
-    for iteration in range(0, 16000):
+    for iteration in range(0, iteration_lim):
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
@@ -21,7 +25,7 @@ if __name__ == '__main__':
             # randomly choose the action according to the possibility of each state
             while reward == 0:
                 index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
-                done, robot_li.pos, reward = env.step(index)                # do a action and get the reward and state
+                done, robot_li.pos, reward = env.step(index)  # do a action and get the reward and state
             if robot_li.pos not in robot_li.sample_list:
                 robot_li.sample_list.append(list(robot_li.pos))
             G = reward
@@ -31,7 +35,7 @@ if __name__ == '__main__':
         y = robot_li.sample_list[-1][1]
         return_saving[x][y] += G
         robot_li.sample_num[x][y] += 1
-        for j in range(len(robot_li.sample_list)-2, -1, -1):
+        for j in range(len(robot_li.sample_list) - 2, -1, -1):
             x = robot_li.sample_list[j][0]
             y = robot_li.sample_list[j][1]
             G = param.AGENT_ACTION.ACTION_REWARD + param.AGENT_ACTION.DISCOUNT_FACTOR * G
@@ -44,7 +48,7 @@ if __name__ == '__main__':
                 if not return_saving[i][j] == 0:
                     robot_li.value[i][j] = return_saving[i][j] / robot_li.sample_num[i][j]
 
-        print(iteration)
+        # print(iteration)
         # print(robot_li.value)
         # print(robot_li.sample_num)
 
@@ -94,7 +98,7 @@ if __name__ == '__main__':
         y += param.AGENT_ACTION.ACTION_SPACE[action_index][1]
 
         sum += 1
-        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE-2, 2):
+        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE - 2, 2):
             success = False
             break
     route.append((x, y))
@@ -103,5 +107,21 @@ if __name__ == '__main__':
     if success:
         print(route)
         print("Monte Carlo V: ", success)
+        successful_num += 1
+        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE - 2) * 2 - 1:
+            shortest_num += 1
     else:
         print("Monte Carlo V: ", success)
+    return successful_num, shortest_num, env.world, route, env, success
+
+
+if __name__ == '__main__':
+
+    sc_n, st_n, world, route, env, result = monte_carlo_v(iteration_lim=1000)
+    if result:
+        for pos in route:
+            if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
+                env.render_4(pos[0], pos[1])
+                time.sleep(0.5)
+    else:
+        tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

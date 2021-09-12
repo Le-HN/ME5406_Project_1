@@ -13,7 +13,7 @@ class LiRobot(gym.Env):
         'video.frames_per_second': 2
     }
 
-    def __init__(self):
+    def __init__(self,):
         if param.ENV_SETTINGS.MATRIX_SIZE == 6:
             self.world = param.ENV_SETTINGS.FOUR_BY_FOUR
         else:
@@ -435,6 +435,120 @@ class LiRobot(gym.Env):
             self.robot.set_color(0, 0, 1)
             self.viewer.add_geom(self.robot)
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+
+    def render_4(self, x, y, mode='human'):
+        screen_width = 600
+        screen_height = 600
+        square_edge = 100
+
+        if self.viewer is None:
+            self.viewer = rendering.Viewer(screen_width, screen_height)  # 调用rendering中的画图函数，#创建600*600的窗口
+            # 创建网格世界，一共包括10条直线，事先算好每条直线的起点和终点坐标，然后绘制这些直线，代码如下：
+            # 创建网格世界
+            self.line1 = rendering.Line((100, 100), (500, 100))
+            self.line2 = rendering.Line((100, 200), (500, 200))
+            self.line3 = rendering.Line((100, 300), (500, 300))
+            self.line4 = rendering.Line((100, 400), (500, 400))
+            self.line5 = rendering.Line((100, 500), (500, 500))
+            self.line6 = rendering.Line((100, 100), (100, 500))
+            self.line7 = rendering.Line((200, 100), (200, 500))
+            self.line8 = rendering.Line((300, 100), (300, 500))
+            self.line9 = rendering.Line((400, 100), (400, 500))
+            self.line10 = rendering.Line((500, 100), (500, 500))
+
+            # set the color of lines
+            self.line1.set_color(0, 0, 0)
+            self.line2.set_color(0, 0, 0)
+            self.line3.set_color(0, 0, 0)
+            self.line4.set_color(0, 0, 0)
+            self.line5.set_color(0, 0, 0)
+            self.line6.set_color(0, 0, 0)
+            self.line7.set_color(0, 0, 0)
+            self.line8.set_color(0, 0, 0)
+            self.line9.set_color(0, 0, 0)
+            self.line10.set_color(0, 0, 0)
+
+            # create obstacles
+            self.obstacle_1 = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, square_edge / 2),
+                                                       (-square_edge / 2, square_edge / 2)])
+            self.offset = rendering.Transform(translation=(150, 150))
+            self.obstacle_1.add_attr(self.offset)
+
+            self.obstacle_2 = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, square_edge / 2),
+                                                       (-square_edge / 2, square_edge / 2)])
+            self.offset = rendering.Transform(translation=(250, 350))
+            self.obstacle_2.add_attr(self.offset)
+            self.obstacle_2.set_color(0, 0, 0)
+
+            self.obstacle_3 = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, square_edge / 2),
+                                                       (-square_edge / 2, square_edge / 2)])
+            self.offset = rendering.Transform(translation=(450, 250))
+            self.obstacle_3.add_attr(self.offset)
+            self.obstacle_3.set_color(0, 0, 0)
+
+            self.obstacle_4 = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, -square_edge / 2),
+                                                       (square_edge / 2, square_edge / 2),
+                                                       (-square_edge / 2, square_edge / 2)])
+            self.offset = rendering.Transform(translation=(450, 350))
+            self.obstacle_4.add_attr(self.offset)
+            self.obstacle_4.set_color(0, 0, 0)
+
+            # set the goal
+            self.goal = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
+                                                 (square_edge / 2, -square_edge / 2),
+                                                 (square_edge / 2, square_edge / 2),
+                                                 (-square_edge / 2, square_edge / 2)])
+            self.offset = rendering.Transform(translation=(450, 150))
+            self.goal.add_attr(self.offset)
+            self.goal.set_color(0, 1, 1)
+
+            # set the initial pos
+            self.robot = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
+                                                  (square_edge / 2, -square_edge / 2),
+                                                  (square_edge / 2, square_edge / 2),
+                                                  (-square_edge / 2, square_edge / 2)])
+            self.offset = rendering.Transform(translation=(50 + y * 100, 550 - x * 100))
+            self.robot.add_attr(self.offset)
+            self.robot.set_color(1, 0, 0)
+
+            # add the components to viewer
+            self.viewer.add_geom(self.line1)
+            self.viewer.add_geom(self.line2)
+            self.viewer.add_geom(self.line3)
+            self.viewer.add_geom(self.line4)
+            self.viewer.add_geom(self.line5)
+            self.viewer.add_geom(self.line6)
+            self.viewer.add_geom(self.line7)
+            self.viewer.add_geom(self.line8)
+            self.viewer.add_geom(self.line9)
+            self.viewer.add_geom(self.line10)
+
+            self.viewer.add_geom(self.obstacle_1)
+            self.viewer.add_geom(self.obstacle_2)
+            self.viewer.add_geom(self.obstacle_3)
+            self.viewer.add_geom(self.obstacle_4)
+
+            self.viewer.add_geom(self.robot)
+            self.viewer.add_geom(self.goal)
+        else:
+            # 创建机器人
+            self.robot = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
+                                                  (square_edge / 2, -square_edge / 2),
+                                                  (square_edge / 2, square_edge / 2),
+                                                  (-square_edge / 2, square_edge / 2)])
+            self.offset = rendering.Transform(translation=(50 + y * 100, 550 - x * 100))
+            self.robot.add_attr(self.offset)
+            self.robot.set_color(0, 0, 1)
+            self.viewer.add_geom(self.robot)
+        return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+
     def observe(self):
         ...
 

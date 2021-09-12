@@ -9,8 +9,8 @@ import time
 def sarsa_q(iteration_lim):
     successful_num = 0
     shortest_num = 0
-    env = lr.LiRobot()
     robot_li = agent.robot()
+    env = lr.LiRobot()
 
     for iteration in range(0, iteration_lim):
         # prediction
