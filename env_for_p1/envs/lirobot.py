@@ -13,8 +13,8 @@ class LiRobot(gym.Env):
         'video.frames_per_second': 2
     }
 
-    def __init__(self,):
-        if param.ENV_SETTINGS.MATRIX_SIZE == 6:
+    def __init__(self, size):
+        if size == 4:
             self.world = param.ENV_SETTINGS.FOUR_BY_FOUR
         else:
             # self.world = self.generate_ten_by_ten()
@@ -46,6 +46,7 @@ class LiRobot(gym.Env):
 
     def reset(self):
         self.agent_pos = [1, 1]
+        self.viewer = None
         return self.observation_space, self.agent_pos
 
     def generate_ten_by_ten(self):
@@ -160,7 +161,7 @@ class LiRobot(gym.Env):
                                                        (square_edge / 2, -square_edge / 2),
                                                        (square_edge / 2, square_edge / 2),
                                                        (-square_edge / 2, square_edge / 2)])
-            self.offset = rendering.Transform(translation=(75, 75))
+            self.offset = rendering.Transform(translation=(525, 375))
             self.obstacle_1.add_attr(self.offset)
 
             self.obstacle_2 = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
@@ -199,7 +200,7 @@ class LiRobot(gym.Env):
                                                        (square_edge / 2, -square_edge / 2),
                                                        (square_edge / 2, square_edge / 2),
                                                        (-square_edge / 2, square_edge / 2)])
-            self.offset = rendering.Transform(translation=(175, 175))
+            self.offset = rendering.Transform(translation=(175, 225))
             self.obstacle_6.add_attr(self.offset)
             self.obstacle_6.set_color(0, 0, 0)
 
@@ -215,7 +216,7 @@ class LiRobot(gym.Env):
                                                        (square_edge / 2, -square_edge / 2),
                                                        (square_edge / 2, square_edge / 2),
                                                        (-square_edge / 2, square_edge / 2)])
-            self.offset = rendering.Transform(translation=(225, 375))
+            self.offset = rendering.Transform(translation=(125, 375))
             self.obstacle_8.add_attr(self.offset)
             self.obstacle_8.set_color(0, 0, 0)
 
@@ -319,7 +320,7 @@ class LiRobot(gym.Env):
                                                         (square_edge / 2, -square_edge / 2),
                                                         (square_edge / 2, square_edge / 2),
                                                         (-square_edge / 2, square_edge / 2)])
-            self.offset = rendering.Transform(translation=(425, 325))
+            self.offset = rendering.Transform(translation=(125, 275))
             self.obstacle_21.add_attr(self.offset)
             self.obstacle_21.set_color(0, 0, 0)
 
@@ -327,7 +328,7 @@ class LiRobot(gym.Env):
                                                         (square_edge / 2, -square_edge / 2),
                                                         (square_edge / 2, square_edge / 2),
                                                         (-square_edge / 2, square_edge / 2)])
-            self.offset = rendering.Transform(translation=(475, 175))
+            self.offset = rendering.Transform(translation=(475, 125))
             self.obstacle_22.add_attr(self.offset)
             self.obstacle_22.set_color(0, 0, 0)
 
@@ -434,6 +435,7 @@ class LiRobot(gym.Env):
             self.robot.add_attr(self.offset)
             self.robot.set_color(0, 0, 1)
             self.viewer.add_geom(self.robot)
+
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def render_4(self, x, y, mode='human'):

@@ -15,9 +15,9 @@ if __name__ == '__main__':
         if training_type == "Q_LEARNING":
             sc_n, st_n, world, route, env, result = q_learning(iteration_lim=500)
         elif training_type == "SARSA":
-            sc_n, st_n, world, route, env, result = sarsa_q(iteration_lim=500)
+            sc_n, st_n, world, route, env, result = sarsa_q(iteration_lim=1000)
         elif training_type == "MONTE_CARLO_Q":
-            sc_n, st_n, world, route, env, result = monte_carlo_q(iteration_lim=1000)
+            sc_n, st_n, world, route, env, result = monte_carlo_q(iteration_lim=3000)
         elif training_type == "MONTE_CARLO_V":
             sc_n, st_n, world, route, env, result = monte_carlo_v(iteration_lim=1000)
         successful_num += sc_n

@@ -9,10 +9,10 @@ import agent
 def monte_carlo_v(iteration_lim):
     successful_num = 0
     shortest_num = 0
-    robot_li = agent.robot()
-    env = lr.LiRobot()
+    robot_li = agent.robot_size_4()
+    env = lr.LiRobot(size=4)
 
-    return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE))
+    return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE_SHOW, param.ENV_SETTINGS.MATRIX_SIZE_SHOW))
     for iteration in range(0, iteration_lim):
         # prediction
         # robot initialization
@@ -28,6 +28,8 @@ def monte_carlo_v(iteration_lim):
                 done, robot_li.pos, reward = env.step(index)  # do a action and get the reward and state
             if robot_li.pos not in robot_li.sample_list:
                 robot_li.sample_list.append(list(robot_li.pos))
+            if reward != -1 and reward != 1:
+                reward = 0
             G = reward
             reward = 0
 
@@ -43,8 +45,8 @@ def monte_carlo_v(iteration_lim):
             robot_li.sample_num[x][y] += 1
 
         # calculate the expectation of the state value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
+        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
+            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
                 if not return_saving[i][j] == 0:
                     robot_li.value[i][j] = return_saving[i][j] / robot_li.sample_num[i][j]
 
@@ -53,8 +55,8 @@ def monte_carlo_v(iteration_lim):
         # print(robot_li.sample_num)
 
         # control
-        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
+        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 1):
+            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 1):
                 next_value_list = [robot_li.value[i][j + 1],
                                    robot_li.value[i + 1][j],
                                    robot_li.value[i][j - 1],
@@ -67,15 +69,15 @@ def monte_carlo_v(iteration_lim):
                         robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
 
         # calculate the value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
+        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
+            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
                 if not robot_li.value[i][j] == 0:
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = robot_li.value[i][j]
                 else:
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = 0
-    #     np.set_printoptions(linewidth=400)
-    #     print(param.ENV_SETTINGS.VALUE_ARRAY)
-    # print(env.world)
+        np.set_printoptions(linewidth=400)
+        print(param.ENV_SETTINGS.VALUE_ARRAY)
+    print(env.world)
 
     robot_li.pos = [1, 1]
     route = []
@@ -98,7 +100,7 @@ def monte_carlo_v(iteration_lim):
         y += param.AGENT_ACTION.ACTION_SPACE[action_index][1]
 
         sum += 1
-        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE - 2, 2):
+        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, 2):
             success = False
             break
     route.append((x, y))
@@ -108,7 +110,7 @@ def monte_carlo_v(iteration_lim):
         print(route)
         print("Monte Carlo V: ", success)
         successful_num += 1
-        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE - 2) * 2 - 1:
+        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2) * 2 - 1:
             shortest_num += 1
     else:
         print("Monte Carlo V: ", success)
@@ -117,10 +119,10 @@ def monte_carlo_v(iteration_lim):
 
 if __name__ == '__main__':
 
-    sc_n, st_n, world, route, env, result = monte_carlo_v(iteration_lim=1000)
+    sc_n, st_n, world, route, env, result = monte_carlo_v(iteration_lim=500)
     if result:
         for pos in route:
-            if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
+            if pos != (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2):
                 env.render_4(pos[0], pos[1])
                 time.sleep(0.5)
     else:

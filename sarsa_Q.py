@@ -10,7 +10,7 @@ def sarsa_q(iteration_lim):
     successful_num = 0
     shortest_num = 0
     robot_li = agent.robot()
-    env = lr.LiRobot()
+    env = lr.LiRobot(size=10)
 
     for iteration in range(0, iteration_lim):
         # prediction
@@ -18,24 +18,66 @@ def sarsa_q(iteration_lim):
         robot_li.obser, robot_li.pos = env.reset()
         reward = 0
         robot_li.sample_list = [[1, 1]]
-        robot_li.action_list = []
+        # robot_li.action_list = []
         done = False
+        first_time = True
+        current_action_index = 0
+        action_value = 0
+        # pre_pos = [1, 1]
         while not done:
+            #
+            # x = pre_pos[0]
+            # y = pre_pos[1]
+
             # randomly choose the action according to the possibility of each state
-            while reward == 0:
-                index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
+            if first_time:
+                while reward == 0:
+                    index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
+                    done, robot_li.pos, reward = env.step(index)  # do a action and get the reward and state
+                first_time = False
+            else:
+                index = current_action_index
                 done, robot_li.pos, reward = env.step(index)  # do a action and get the reward and state
+            if reward != -1 and reward != 1:
+                reward = 0
+            # if reward == -1:
+            #     reward = -0.1
             if robot_li.pos not in robot_li.sample_list:
                 robot_li.sample_list.append(list(robot_li.pos))
+            # robot_li.action_list.append(index)
             x = robot_li.sample_list[-2][0]
             y = robot_li.sample_list[-2][1]
-            robot_li.action_list.append(index)
-            robot_li.value_Q[x][y][index] += param.AGENT_ACTION.L_RATE * (reward + \
-                                                                          param.AGENT_ACTION.DISCOUNT_FACTOR * \
-                                                                          np.random.choice(robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]], p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]) - \
+
+            valid_action = False
+            while (not valid_action) and (reward == 0):
+                action_value = np.random.choice(robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
+                # action_value = max(robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]])
+                for k in range(0, 4):
+                    if action_value == robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]][k]:
+                        current_action_index = k
+                        break
+                assume_x = robot_li.pos[0] + param.AGENT_ACTION.ACTION_SPACE[current_action_index][0]
+                assume_y = robot_li.pos[1] + param.AGENT_ACTION.ACTION_SPACE[current_action_index][1]
+                if robot_li.obser[assume_x][assume_y] == -2:
+                    valid_action = False
+                else:
+                    valid_action = True
+            if reward == 1 or reward == -1:
+                action_value = 0
+
+            # action_value = robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]][current_action_index]
+            robot_li.value_Q[x][y][index] += param.AGENT_ACTION.L_RATE * (reward +
+                                                                          param.AGENT_ACTION.DISCOUNT_FACTOR * action_value -
                                                                           robot_li.value_Q[x][y][index])
+
             reward = 0
 
+        # for pos in robot_li.sample_list:
+        #     if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
+        #         env.render_10(pos[0], pos[1])
+        #         time.sleep(0.01)
+        # env.viewer.close()
+        # print(iteration)
         # print(robot_li.action_list)
         # print(return_saving)
         # print(robot_li.sample_num)
@@ -47,6 +89,14 @@ def sarsa_q(iteration_lim):
                                    robot_li.value_Q[i][j][1],
                                    robot_li.value_Q[i][j][2],
                                    robot_li.value_Q[i][j][3]]
+                if robot_li.obser[i][j+1] == -2:
+                    robot_li.value_Q[i][j][0] = -10
+                if robot_li.obser[i+1][j] == -2:
+                    robot_li.value_Q[i][j][1] = -10
+                if robot_li.obser[i][j-1] == -2:
+                    robot_li.value_Q[i][j][2] = -10
+                if robot_li.obser[i-1][j] == -2:
+                    robot_li.value_Q[i][j][3] = -10
                 action_index = next_value_list.index(max(next_value_list))
                 for k in range(0, 4):
                     if action_index == k:

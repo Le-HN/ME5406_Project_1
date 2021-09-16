@@ -12,24 +12,25 @@ class ENV_SETTINGS:
                                          [-2,  0,  0,  0,  0,  0, -1,  0,  0,  0,  0, -2],
                                          [-2,  0, -1,  0, -1,  0,  0, -1,  0,  0, -1, -2],
                                          [-2,  0,  0,  0, -1,  0,  0,  0,  0,  0,  0, -2],
-                                         [-2,  0,  0,  0, -1, -1,  0, -1,  0, -1,  0, -2],
-                                         [-2,  0,  0,  0, -1,  0,  0,  0, -1,  0,  0, -2],
-                                         [-2, -1,  0,  0,  0,  0, -1,  0, -1,  0,  0, -2],
-                                         [-2,  0,  0,  0,  0, -1,  0,  0,  0, -1,  0, -2],
-                                         [-2, -1,  0, -1,  0,  0,  0, -1,  0, -1,  0, -2],
-                                         [-2,  0,  0, -1,  0, -1,  0,  0,  0,  0,  0, -2],
-                                         [-2, -1,  0,  0,  0,  0,  0, -1,  0,  0,  1, -2],
+                                         [-2,  0, -1,  0,  0, -1,  0, -1,  0, -1, -1, -2],
+                                         [-2,  0,  0,  0, -1,  0,  0,  0,  0,  0,  0, -2],
+                                         [-2, -1, -1,  0,  0,  0, -1,  0, -1,  0,  0, -2],
+                                         [-2,  0,  0, -1,  0, -1,  0,  0,  0, -1,  0, -2],
+                                         [-2, -1,  0,  0,  0,  0,  0, -1,  0,  0,  0, -2],
+                                         [-2,  0,  0, -1,  0, -1,  0,  0,  0, -1,  0, -2],
+                                         [-2,  0,  0,  0,  0,  0,  0, -1,  0,  0,  1, -2],
                                          [-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]])
     TEN_BY_TEN_TEST          = np.zeros((12, 12))
     MATRIX_SIZE              = 12                                              # walls + map size
-    VALUE_ARRAY              = np.zeros((MATRIX_SIZE, MATRIX_SIZE))
+    MATRIX_SIZE_SHOW         = 6
+    VALUE_ARRAY              = np.zeros((MATRIX_SIZE_SHOW, MATRIX_SIZE_SHOW))
     STATE_ACTION_VALUE = np.zeros((MATRIX_SIZE, MATRIX_SIZE, 4))
 
 
 class AGENT_ACTION:
     ACTION_SPACE             = [[0, 1], [1, 0], [0, -1], [-1, 0]]              # East, South, West, North
     ACTION_PROB_INT          = 0.25
-    ACTION_REWARD            = 0.1
-    DISCOUNT_FACTOR          = 0.8
-    EPSILON                  = 0.15
-    L_RATE                   = 0.01
+    ACTION_REWARD            = 0.02
+    DISCOUNT_FACTOR          = 0.9
+    EPSILON                  = 0.1
+    L_RATE                   = 0.6

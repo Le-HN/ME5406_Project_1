@@ -9,10 +9,10 @@ import agent
 def monte_carlo_q(iteration_lim):
     successful_num = 0
     shortest_num = 0
-    robot_li = agent.robot()
-    env = lr.LiRobot()
+    robot_li = agent.robot_size_4()
+    env = lr.LiRobot(size=4)
 
-    return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE, param.ENV_SETTINGS.MATRIX_SIZE, 4))
+    return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE_SHOW, param.ENV_SETTINGS.MATRIX_SIZE_SHOW, 4))
     for iteration in range(0, iteration_lim):
         # prediction
         # robot initialization
@@ -27,6 +27,8 @@ def monte_carlo_q(iteration_lim):
             while reward == 0:
                 index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
                 done, robot_li.pos, reward = env.step(index)                # do a action and get the reward and state
+            if reward != -1 and reward != 1:
+                reward = 0
             if robot_li.pos not in robot_li.sample_list:
                 robot_li.sample_list.append(list(robot_li.pos))
             robot_li.action_list.append(index)
@@ -44,24 +46,25 @@ def monte_carlo_q(iteration_lim):
             robot_li.sample_num_Q[x][y][robot_li.action_list[j]] += 1
 
         # calculate the expectation of the state value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
+        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
+            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
                 for k in range(0, 4):
                     if not return_saving[i][j][k] == 0:
                         robot_li.value_Q[i][j][k] = return_saving[i][j][k] / robot_li.sample_num_Q[i][j][k]
 
-        # print(iteration)
-        # print(robot_li.action_list)
-        # print(return_saving)
-        # print(robot_li.sample_num)
+        print(iteration)
+        print(robot_li.action_list)
+        print(return_saving)
+        print(robot_li.sample_num)
 
         # control
-        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
+        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 1):
+            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 1):
                 next_value_list = [robot_li.value_Q[i][j][0],
                                    robot_li.value_Q[i][j][1],
                                    robot_li.value_Q[i][j][2],
                                    robot_li.value_Q[i][j][3]]
+
                 action_index = next_value_list.index(max(next_value_list))
                 for k in range(0, 4):
                     if action_index == k:
@@ -69,8 +72,8 @@ def monte_carlo_q(iteration_lim):
                     else:
                         robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
 
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
+        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
+            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
                 for k in range(0, 4):
                     param.ENV_SETTINGS.STATE_ACTION_VALUE[i][j][k] = robot_li.value_Q[i][j][k]
 
@@ -102,17 +105,17 @@ def monte_carlo_q(iteration_lim):
         y += param.AGENT_ACTION.ACTION_SPACE[direction][1]
 
         sum += 1
-        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE - 2, 2):
+        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, 2):
             success = False
             break
-    route.append((param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2))
+    route.append((param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2))
     if env.world[x][y] != 1:
         success = False
     if success:
         print(route)
         print("Monte Carlo Q: ", success)
         successful_num += 1
-        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE - 2) * 2 - 1:
+        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2) * 2 - 1:
             shortest_num += 1
     else:
         print("Monte Carlo Q: ", success)
@@ -121,10 +124,10 @@ def monte_carlo_q(iteration_lim):
 
 if __name__ == '__main__':
 
-    sc_n, st_n, world, route, env, result = monte_carlo_q(iteration_lim=500)
+    sc_n, st_n, world, route, env, result = monte_carlo_q(iteration_lim=3000)
     if result:
         for pos in route:
-            if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
+            if pos != (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2):
                 env.render_4(pos[0], pos[1])
                 time.sleep(0.5)
     else:
