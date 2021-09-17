@@ -27,8 +27,8 @@ def q_learning(iteration_lim):
                 done, robot_li.pos, reward = env.step(index)  # do a action and get the reward and state
             if reward != -1 and reward != 1:
                 reward = 0
-            if robot_li.pos not in robot_li.sample_list:
-                robot_li.sample_list.append(list(robot_li.pos))
+            # if robot_li.pos not in robot_li.sample_list:
+            robot_li.sample_list.append(list(robot_li.pos))
             x = robot_li.sample_list[-2][0]
             y = robot_li.sample_list[-2][1]
             # robot_li.action_list.append(index)

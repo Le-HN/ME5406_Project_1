@@ -23,6 +23,7 @@ def sarsa_q(iteration_lim):
         first_time = True
         current_action_index = 0
         action_value = 0
+        index = 0
         # pre_pos = [1, 1]
         while not done:
             #
@@ -40,10 +41,9 @@ def sarsa_q(iteration_lim):
                 done, robot_li.pos, reward = env.step(index)  # do a action and get the reward and state
             if reward != -1 and reward != 1:
                 reward = 0
-            # if reward == -1:
-            #     reward = -0.1
-            if robot_li.pos not in robot_li.sample_list:
-                robot_li.sample_list.append(list(robot_li.pos))
+
+            # if robot_li.pos not in robot_li.sample_list:
+            robot_li.sample_list.append(list(robot_li.pos))
             # robot_li.action_list.append(index)
             x = robot_li.sample_list[-2][0]
             y = robot_li.sample_list[-2][1]
@@ -113,6 +113,9 @@ def sarsa_q(iteration_lim):
         # np.set_printoptions(linewidth=400)
         # for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
         #     print(param.ENV_SETTINGS.STATE_ACTION_VALUE[i])
+    # np.set_printoptions(linewidth=400)
+    # for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
+    #     print(param.ENV_SETTINGS.STATE_ACTION_VALUE[i])
 
     # test
     robot_li.pos = [1, 1]
@@ -155,7 +158,7 @@ def sarsa_q(iteration_lim):
 
 if __name__ == '__main__':
 
-    sc_n, st_n, world, route, env, result = sarsa_q(iteration_lim=500)
+    sc_n, st_n, world, route, env, result = sarsa_q(iteration_lim=2000)
     if result:
         for pos in route:
             if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):

@@ -9,8 +9,8 @@ import agent
 def monte_carlo_q(iteration_lim):
     successful_num = 0
     shortest_num = 0
-    robot_li = agent.robot_size_4()
-    env = lr.LiRobot(size=4)
+    robot_li = agent.robot()
+    env = lr.LiRobot(size=10)
 
     return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE_SHOW, param.ENV_SETTINGS.MATRIX_SIZE_SHOW, 4))
     for iteration in range(0, iteration_lim):
@@ -31,7 +31,7 @@ def monte_carlo_q(iteration_lim):
                 reward = 0
             if robot_li.pos not in robot_li.sample_list:
                 robot_li.sample_list.append(list(robot_li.pos))
-            robot_li.action_list.append(index)
+                robot_li.action_list.append(index)
             G = reward
             reward = 0
         # x = robot_li.sample_list[-1][0]
@@ -52,10 +52,10 @@ def monte_carlo_q(iteration_lim):
                     if not return_saving[i][j][k] == 0:
                         robot_li.value_Q[i][j][k] = return_saving[i][j][k] / robot_li.sample_num_Q[i][j][k]
 
-        print(iteration)
-        print(robot_li.action_list)
-        print(return_saving)
-        print(robot_li.sample_num)
+        # print(iteration)
+        # print(robot_li.action_list)
+        # print(return_saving)
+        # print(robot_li.sample_num)
 
         # control
         for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 1):
@@ -81,7 +81,7 @@ def monte_carlo_q(iteration_lim):
         # for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
         #     print(param.ENV_SETTINGS.STATE_ACTION_VALUE[i])
 
-    print(env.world)
+    # print(env.world)
 
     # test
     robot_li.pos = [1, 1]
@@ -124,11 +124,11 @@ def monte_carlo_q(iteration_lim):
 
 if __name__ == '__main__':
 
-    sc_n, st_n, world, route, env, result = monte_carlo_q(iteration_lim=3000)
+    sc_n, st_n, world, route, env, result = monte_carlo_q(iteration_lim=20000)
     if result:
         for pos in route:
             if pos != (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2):
-                env.render_4(pos[0], pos[1])
+                env.render_10(pos[0], pos[1])
                 time.sleep(0.5)
     else:
         tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')
