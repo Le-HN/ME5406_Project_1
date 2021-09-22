@@ -1,4 +1,5 @@
 import env_for_p1.envs.lirobot as lr
+import matplotlib.pyplot as plt
 import tkinter.messagebox
 import parameters as param
 import numpy as np
@@ -7,10 +8,15 @@ import agent
 
 
 def monte_carlo_v(iteration_lim):
-    successful_num = 0
-    shortest_num = 0
-    robot_li = agent.robot_size_4()
-    env = lr.LiRobot(size=4)
+    # successful_num = 0
+    # shortest_num = 0
+    # variables to store the statics for plot
+    average_reward_list = []
+    average_reward = 0
+    episode_list = []
+    episode = 0
+    robot_li = agent.robot()
+    env = lr.LiRobot(size=10)
 
     return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE_SHOW, param.ENV_SETTINGS.MATRIX_SIZE_SHOW))
     for iteration in range(0, iteration_lim):
@@ -30,6 +36,12 @@ def monte_carlo_v(iteration_lim):
                 robot_li.sample_list.append(list(robot_li.pos))
             if reward != -1 and reward != 1:
                 reward = 0
+            else:
+                average_reward += reward
+                episode += 1
+                if episode % 20 == 0:
+                    average_reward_list.append(average_reward / episode)
+                    episode_list.append(episode)
             G = reward
             reward = 0
 
@@ -75,9 +87,9 @@ def monte_carlo_v(iteration_lim):
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = robot_li.value[i][j]
                 else:
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = 0
-        np.set_printoptions(linewidth=400)
-        print(param.ENV_SETTINGS.VALUE_ARRAY)
-    print(env.world)
+    #     np.set_printoptions(linewidth=400)
+    #     print(param.ENV_SETTINGS.VALUE_ARRAY)
+    # print(env.world)
 
     robot_li.pos = [1, 1]
     route = []
@@ -109,21 +121,29 @@ def monte_carlo_v(iteration_lim):
     if success:
         print(route)
         print("Monte Carlo V: ", success)
-        successful_num += 1
-        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2) * 2 - 1:
-            shortest_num += 1
+        # successful_num += 1
+        # if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2) * 2 - 1:
+        #     shortest_num += 1
     else:
         print("Monte Carlo V: ", success)
-    return successful_num, shortest_num, env.world, route, env, success
+    return episode_list, average_reward_list, env.world, route, env, success
 
 
 if __name__ == '__main__':
 
-    sc_n, st_n, world, route, env, result = monte_carlo_v(iteration_lim=500)
+    e_list, ar_list, world, route, env, result = monte_carlo_v(iteration_lim=2000)
+
+    plt.plot(e_list, ar_list, label="Monte Carlo V")
+    plt.xlabel("Episode")
+    plt.ylabel("Average Reward")
+    plt.ylim(-1, 1)
+    plt.legend()
+    plt.show()
+
     if result:
         for pos in route:
             if pos != (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2):
-                env.render_4(pos[0], pos[1])
+                env.render_10(pos[0], pos[1])
                 time.sleep(0.5)
     else:
         tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

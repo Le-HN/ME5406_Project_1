@@ -1,4 +1,5 @@
 import env_for_p1.envs.lirobot as lr
+import matplotlib.pyplot as plt
 import tkinter.messagebox
 import parameters as param
 import numpy as np
@@ -7,8 +8,15 @@ import time
 
 
 def sarsa_q(iteration_lim):
-    successful_num = 0
-    shortest_num = 0
+    # variables to store the statics for plot
+    average_q_value_list = []
+    average_q_value = 0
+    q_value_counter = 0
+    average_reward_list = []
+    average_reward = 0
+    episode_list = []
+    episode = 0
+    # Instantiate the robot and environment
     robot_li = agent.robot()
     env = lr.LiRobot(size=10)
 
@@ -26,6 +34,27 @@ def sarsa_q(iteration_lim):
         index = 0
         # pre_pos = [1, 1]
         while not done:
+            # control
+            for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
+                for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
+                    next_value_list = [robot_li.value_Q[i][j][0],
+                                       robot_li.value_Q[i][j][1],
+                                       robot_li.value_Q[i][j][2],
+                                       robot_li.value_Q[i][j][3]]
+                    if robot_li.obser[i][j + 1] == -2:
+                        robot_li.value_Q[i][j][0] = -10
+                    if robot_li.obser[i + 1][j] == -2:
+                        robot_li.value_Q[i][j][1] = -10
+                    if robot_li.obser[i][j - 1] == -2:
+                        robot_li.value_Q[i][j][2] = -10
+                    if robot_li.obser[i - 1][j] == -2:
+                        robot_li.value_Q[i][j][3] = -10
+                    action_index = next_value_list.index(max(next_value_list))
+                    for k in range(0, 4):
+                        if action_index == k:
+                            robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
+                        else:
+                            robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
             #
             # x = pre_pos[0]
             # y = pre_pos[1]
@@ -41,8 +70,13 @@ def sarsa_q(iteration_lim):
                 done, robot_li.pos, reward = env.step(index)  # do a action and get the reward and state
             if reward != -1 and reward != 1:
                 reward = 0
-
-            # if robot_li.pos not in robot_li.sample_list:
+            else:
+                average_reward += reward
+                episode += 1
+                if episode % 20 == 0:
+                    average_reward_list.append(average_reward / episode)
+                    episode_list.append(episode)
+            # save the trajectory
             robot_li.sample_list.append(list(robot_li.pos))
             # robot_li.action_list.append(index)
             x = robot_li.sample_list[-2][0]
@@ -74,7 +108,7 @@ def sarsa_q(iteration_lim):
 
         # for pos in robot_li.sample_list:
         #     if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
-        #         env.render_10(pos[0], pos[1])
+        #         env.render_4(pos[0], pos[1])
         #         time.sleep(0.01)
         # env.viewer.close()
         # print(iteration)
@@ -82,40 +116,21 @@ def sarsa_q(iteration_lim):
         # print(return_saving)
         # print(robot_li.sample_num)
 
-        # control
-        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-                next_value_list = [robot_li.value_Q[i][j][0],
-                                   robot_li.value_Q[i][j][1],
-                                   robot_li.value_Q[i][j][2],
-                                   robot_li.value_Q[i][j][3]]
-                if robot_li.obser[i][j+1] == -2:
-                    robot_li.value_Q[i][j][0] = -10
-                if robot_li.obser[i+1][j] == -2:
-                    robot_li.value_Q[i][j][1] = -10
-                if robot_li.obser[i][j-1] == -2:
-                    robot_li.value_Q[i][j][2] = -10
-                if robot_li.obser[i-1][j] == -2:
-                    robot_li.value_Q[i][j][3] = -10
-                action_index = next_value_list.index(max(next_value_list))
-                for k in range(0, 4):
-                    if action_index == k:
-                        robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
-                    else:
-                        robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
-
         # calculate the value
         for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
             for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
                 for k in range(0, 4):
                     param.ENV_SETTINGS.STATE_ACTION_VALUE[i][j][k] = robot_li.value_Q[i][j][k]
-
+                    if robot_li.value_Q[i][j][k] != -10 and episode % 20 == 0:
+                        average_q_value += robot_li.value_Q[i][j][k]
+                        q_value_counter += 1
+        if episode % 20 == 0:
+            average_q_value_list.append(average_q_value / q_value_counter)
+            average_q_value = 0
+            q_value_counter = 0
         # np.set_printoptions(linewidth=400)
         # for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
         #     print(param.ENV_SETTINGS.STATE_ACTION_VALUE[i])
-    # np.set_printoptions(linewidth=400)
-    # for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-    #     print(param.ENV_SETTINGS.STATE_ACTION_VALUE[i])
 
     # test
     robot_li.pos = [1, 1]
@@ -148,17 +163,29 @@ def sarsa_q(iteration_lim):
     if success:
         print(route)
         print("SARSA: ", success)
-        successful_num += 1
-        if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE - 2) * 2 - 1:
-            shortest_num += 1
     else:
         print("SARSA: ", success)
-    return successful_num, shortest_num, env.world, route, env, success
+    return episode_list, average_reward_list, average_q_value_list, env.world, route, env, success
 
 
 if __name__ == '__main__':
 
-    sc_n, st_n, world, route, env, result = sarsa_q(iteration_lim=2000)
+    e_list, ar_list, ar_q_list, world, route, env, result = sarsa_q(iteration_lim=3000)
+
+    plt.plot(e_list, ar_list, label="SARSA")
+    plt.xlabel("Episode")
+    plt.ylabel("Average Reward")
+    plt.ylim(-1, 1)
+    plt.legend()
+    plt.show()
+
+    plt.plot(e_list, ar_q_list, label="SARSA")
+    plt.xlabel("Episode")
+    plt.ylabel("Average Q Value")
+    plt.ylim(-0.03, 0.03)
+    plt.legend()
+    plt.show()
+
     if result:
         for pos in route:
             if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
