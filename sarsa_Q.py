@@ -55,9 +55,6 @@ def sarsa_q(iteration_lim):
                             robot_li.probs[i][j][k] = 1 - param.AGENT_ACTION.EPSILON + param.AGENT_ACTION.EPSILON / 4
                         else:
                             robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
-            #
-            # x = pre_pos[0]
-            # y = pre_pos[1]
 
             # randomly choose the action according to the possibility of each state
             if first_time:
@@ -170,19 +167,19 @@ def sarsa_q(iteration_lim):
 
 if __name__ == '__main__':
 
-    e_list, ar_list, ar_q_list, world, route, env, result = sarsa_q(iteration_lim=3000)
+    e_list, ar_list, ar_q_list, world, route, env, result = sarsa_q(iteration_lim=10000)
 
     plt.plot(e_list, ar_list, label="SARSA")
     plt.xlabel("Episode")
     plt.ylabel("Average Reward")
-    plt.ylim(-1, 1)
+    plt.ylim(-1.5, 1.5)
     plt.legend()
     plt.show()
 
     plt.plot(e_list, ar_q_list, label="SARSA")
     plt.xlabel("Episode")
     plt.ylabel("Average Q Value")
-    plt.ylim(-0.03, 0.03)
+    plt.ylim(-0.1, 0.1)
     plt.legend()
     plt.show()
 
@@ -190,6 +187,6 @@ if __name__ == '__main__':
         for pos in route:
             if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
                 env.render_10(pos[0], pos[1])
-                time.sleep(0.5)
+                time.sleep(1)
     else:
         tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

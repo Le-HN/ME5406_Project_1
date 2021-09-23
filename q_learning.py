@@ -9,14 +9,20 @@ import agent
 
 def q_learning(iteration_lim):
     # variables to store the statics for plot
+    # average q value
     average_q_value_list = []
     average_q_value = 0
     q_value_counter = 0
+
+    # average reward
     average_reward_list = []
     average_reward = 0
+
+    # episode
     episode_list = []
     episode = 0
-    # Instantiate the robot and environment
+
+    # instantiate the robot and environment
     robot_li = agent.robot()
     env = lr.LiRobot(size=10)
 
@@ -173,14 +179,14 @@ if __name__ == '__main__':
     plt.plot(e_list, ar_list, label="Q-Learning")
     plt.xlabel("Episode")
     plt.ylabel("Average Reward")
-    plt.ylim(-1, 1)
+    plt.ylim(-1.5, 1.5)
     plt.legend()
     plt.show()
 
     plt.plot(e_list, ar_q_list, label="Q-Learning")
     plt.xlabel("Episode")
     plt.ylabel("Average Q Value")
-    plt.ylim(-0.03, 0.03)
+    plt.ylim(-0.1, 0.1)
     plt.legend()
     plt.show()
     # if success, render the route

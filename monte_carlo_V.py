@@ -8,9 +8,10 @@ import agent
 
 
 def monte_carlo_v(iteration_lim):
-    # successful_num = 0
-    # shortest_num = 0
     # variables to store the statics for plot
+    average_v_value_list = []
+    average_v_value = 0
+    v_value_counter = 0
     average_reward_list = []
     average_reward = 0
     episode_list = []
@@ -62,7 +63,7 @@ def monte_carlo_v(iteration_lim):
                 if not return_saving[i][j] == 0:
                     robot_li.value[i][j] = return_saving[i][j] / robot_li.sample_num[i][j]
 
-        # print(iteration)
+        print(iteration)
         # print(robot_li.value)
         # print(robot_li.sample_num)
 
@@ -87,6 +88,13 @@ def monte_carlo_v(iteration_lim):
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = robot_li.value[i][j]
                 else:
                     param.ENV_SETTINGS.VALUE_ARRAY[i][j] = 0
+                if episode % 20 == 0:
+                    average_v_value += param.ENV_SETTINGS.VALUE_ARRAY[i][j]
+                    v_value_counter += 1
+        if episode % 20 == 0:
+            average_v_value_list.append(average_v_value / v_value_counter)
+            average_v_value = 0
+            v_value_counter = 0
     #     np.set_printoptions(linewidth=400)
     #     print(param.ENV_SETTINGS.VALUE_ARRAY)
     # print(env.world)
@@ -121,22 +129,26 @@ def monte_carlo_v(iteration_lim):
     if success:
         print(route)
         print("Monte Carlo V: ", success)
-        # successful_num += 1
-        # if len(route) == (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2) * 2 - 1:
-        #     shortest_num += 1
     else:
         print("Monte Carlo V: ", success)
-    return episode_list, average_reward_list, env.world, route, env, success
+    return episode_list, average_reward_list, average_v_value_list, env.world, route, env, success
 
 
 if __name__ == '__main__':
 
-    e_list, ar_list, world, route, env, result = monte_carlo_v(iteration_lim=2000)
+    e_list, ar_list, ar_v_list, world, route, env, result = monte_carlo_v(iteration_lim=100000)
 
     plt.plot(e_list, ar_list, label="Monte Carlo V")
     plt.xlabel("Episode")
     plt.ylabel("Average Reward")
-    plt.ylim(-1, 1)
+    plt.ylim(-1.5, 1.5)
+    plt.legend()
+    plt.show()
+
+    plt.plot(e_list, ar_v_list, label="Monte Carlo V")
+    plt.xlabel("Episode")
+    plt.ylabel("Average V Value")
+    plt.ylim(-0.2, 0.2)
     plt.legend()
     plt.show()
 
