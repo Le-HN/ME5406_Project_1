@@ -23,8 +23,8 @@ def q_learning(iteration_lim):
     episode = 0
 
     # instantiate the robot and environment
-    robot_li = agent.robot()
-    env = lr.LiRobot(size=10)
+    robot_li = agent.robot_size_4()
+    env = lr.LiRobot(size=4)
 
     for iteration in range(0, iteration_lim):
 
@@ -140,6 +140,7 @@ def q_learning(iteration_lim):
     y = robot_li.pos[1]
     sum = 0
     success = True
+
     # find the route according to the q value
     while env.world[x][y] == 0:
         robot_li.pos = [x, y]
@@ -154,8 +155,8 @@ def q_learning(iteration_lim):
 
         x += param.AGENT_ACTION.ACTION_SPACE[direction][0]
         y += param.AGENT_ACTION.ACTION_SPACE[direction][1]
-
         sum += 1
+
         # if the number of steps is out of the size of map, stop
         if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE - 2, 2):
             success = False
@@ -173,28 +174,62 @@ def q_learning(iteration_lim):
     return episode_list, average_reward_list, average_q_value_list, env.world, route, env, success
 
 
+def successful_times_test():
+    test_iteration = 100
+    successful_num = 0
+    for i in range(0, test_iteration):
+        e_list, ar_list, ar_q_list, world, route, env, result = q_learning(iteration_lim=3000)
+        if result:
+            successful_num += 1
+    failed_num = test_iteration - successful_num
+    successful_list = [successful_num]
+    failed_list = [failed_num]
+
+    bar_width = 0.8
+    bar_label = ("success", "failure")
+    successful_index = 1
+    failed_index = successful_index + bar_width
+    plt.bar(successful_index, successful_list, width=bar_width, label='success')
+    plt.bar(failed_index, failed_list, width=bar_width, label='failure')
+
+    plt.legend()
+    plt.xticks([successful_index, failed_index], bar_label)
+    plt.ylim(0, test_iteration)
+    plt.ylabel("Number")
+    plt.show()
+
+
 if __name__ == '__main__':
 
-    e_list, ar_list, ar_q_list, world, route, env, result = q_learning(iteration_lim=10000)
-    plt.plot(e_list, ar_list, label="Q-Learning")
-    plt.xlabel("Episode")
-    plt.ylabel("Average Reward")
-    plt.ylim(-1.5, 1.5)
-    plt.legend()
-    plt.show()
-
-    plt.plot(e_list, ar_q_list, label="Q-Learning")
-    plt.xlabel("Episode")
-    plt.ylabel("Average Q Value")
-    plt.ylim(-0.1, 0.1)
-    plt.legend()
-    plt.show()
-    # if success, render the route
-    if result:
-        for pos in route:
-            if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
-                env.render_10(pos[0], pos[1])
-                time.sleep(1)
-    # if not success, show the failed result
+    if param.TEST:
+        # count times of success then plot
+        successful_times_test()
     else:
-        tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')
+        # run for the illustration
+        e_list, ar_list, ar_q_list, world, route, env, result = q_learning(iteration_lim=10000)
+
+        # plot the average reward
+        plt.plot(e_list, ar_list, label="Q-Learning")
+        plt.xlabel("Episode")
+        plt.ylabel("Average Reward")
+        plt.ylim(-1.5, 1.5)
+        plt.legend()
+        plt.show()
+
+        # plot the average q value
+        plt.plot(e_list, ar_q_list, label="Q-Learning")
+        plt.xlabel("Episode")
+        plt.ylabel("Average Q Value")
+        plt.ylim(-0.1, 0.1)
+        plt.legend()
+        plt.show()
+
+        # if success, render the route
+        if result:
+            for pos in route:
+                if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
+                    env.render_10(pos[0], pos[1])
+                    time.sleep(1)
+        # if not success, show the failed result
+        else:
+            tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

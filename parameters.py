@@ -23,8 +23,8 @@ class ENV_SETTINGS:
                                          [-2,  0,  0,  0,  0,  0,  0, -1,  0,  0,  1, -2],
                                          [-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]])
     TEN_BY_TEN_TEST          = np.zeros((12, 12))
-    MATRIX_SIZE              = 12                                               # walls + map size
-    MATRIX_SIZE_SHOW         = 12
+    MATRIX_SIZE              = 6                                              # walls + map size
+    MATRIX_SIZE_SHOW         = 6
     VALUE_ARRAY              = np.zeros((MATRIX_SIZE_SHOW, MATRIX_SIZE_SHOW))
     STATE_ACTION_VALUE = np.zeros((MATRIX_SIZE, MATRIX_SIZE, 4))
 
@@ -35,7 +35,12 @@ class AGENT_ACTION:
     DISCOUNT_FACTOR          = 0.9
     EPSILON                  = 0.1
     L_RATE                   = 0.02
+
     ACTION_REWARD            = 0.02                                            # ACTION_REWARD is actually useless here,
                                                                                # just to avoid hit the wall.
                                                                                # Because if the ACTION_REWARD is added every step,
                                                                                # Q value will not converge.
+
+
+# to calculate the number of success and failure
+TEST = True
