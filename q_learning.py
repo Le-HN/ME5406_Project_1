@@ -7,6 +7,7 @@ import agent
 
 
 def q_learning(map_size, iteration_lim):
+
     # variables to store the statics for plot
     # average q value
     average_q_value_list = []
@@ -29,21 +30,25 @@ def q_learning(map_size, iteration_lim):
         robot_li = agent.robot_size_4()
         env = lr.LiRobot(size=4)
 
+    # the original map size plus the walls on two sides
     map_plus_wall_size = map_size + 2
 
     for iteration in range(0, iteration_lim):
 
         if (iteration + 1) % 100 == 0:
             print("Training episode: ", iteration + 1)
+
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
         reward = 0
+
         # initialize the trajectory list
         robot_li.sample_list = [[1, 1]]
         done = False
 
         while not done:
+
             # the action was chose according to the possibility of each state in the possibility matrix
             while reward == 0:
                 index = np.random.choice([0, 1, 2, 3], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
@@ -60,6 +65,7 @@ def q_learning(map_size, iteration_lim):
                 if episode % 20 == 0:
                     average_reward_list.append(average_reward / episode)
                     episode_list.append(episode)
+
             # save the trajectory
             robot_li.sample_list.append(list(robot_li.pos))
 
@@ -78,15 +84,6 @@ def q_learning(map_size, iteration_lim):
             robot_li.value_Q[x][y][index] += param.AGENT_ACTION.L_RATE * (reward + \
                                                                           param.AGENT_ACTION.DISCOUNT_FACTOR * q_current - robot_li.value_Q[x][y][index])
             reward = 0
-
-        # print the route to debug
-        # for pos in robot_li.sample_list:
-        #     if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
-        #         env.render_10(pos[0], pos[1])
-        #         time.sleep(0.01)
-        # env.viewer.close()
-
-        # print(iteration)
 
         # control
         for i in range(1, map_plus_wall_size - 1):
@@ -131,11 +128,6 @@ def q_learning(map_size, iteration_lim):
             average_q_value = 0
             q_value_counter = 0
 
-        # print the q value to debug
-        # np.set_printoptions(linewidth=400)
-        # for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-        #     print(param.ENV_SETTINGS.STATE_ACTION_VALUE[i])
-
     # test
     # to find a route from start point to the destination
     # initialize the position
@@ -169,12 +161,15 @@ def q_learning(map_size, iteration_lim):
             success = False
             break
     route.append((map_plus_wall_size - 2, map_plus_wall_size - 2))
+
     # if the ending is not 1, path finding failed
     if env.world[x][y] != 1:
         success = False
 
+    # print the world
     print(env.world)
 
+    # print the result
     if success:
         print(route)
         print("Q_Learning: ", success)
@@ -184,6 +179,7 @@ def q_learning(map_size, iteration_lim):
     return episode_list, average_reward_list, average_q_value_list, env.world, route, env, success
 
 
+# calculate the number of success / failure at particular training iteration and map size
 def successful_times_test():
     test_iteration = 100
     successful_num = 0
@@ -195,6 +191,7 @@ def successful_times_test():
     successful_list = [successful_num]
     failed_list = [failed_num]
 
+    # plot the bar chart
     bar_width = 0.8
     bar_label = ("success", "failure")
     successful_index = 1
@@ -212,6 +209,7 @@ def successful_times_test():
 if __name__ == '__main__':
 
     map_plus_wall_size = 12
+
     if param.TEST:
         # count times of success then plot
         successful_times_test()

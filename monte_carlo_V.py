@@ -5,12 +5,14 @@ import numpy as np
 import time
 import agent
 
-# MONTE_CARLO_V is not available because it used state value rather than state-action value so that its performance
-# is very poor
-# I stopped updating it when the other 3 work quite well, so it won't work properly because there are some variables'
-# name didn't change
-# but I don't want to delete it, cuz it gave the fundamental structure of the other 3 programs
-# although it doesn't work well, I'm still grateful for it
+'''
+    MONTE_CARLO_V is not available because it used state value rather than state-action value so that its performance
+    is very poor
+    I stopped updating it when the other 3 work quite well, so it won't work properly because there are some variables'
+    name didn't change
+    but I don't want to delete it, cuz it gave the fundamental structure of the other 3 programs
+    although it doesn't work well, I'm still grateful for it
+'''
 
 
 def monte_carlo_v(iteration_lim):

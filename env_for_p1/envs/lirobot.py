@@ -14,49 +14,70 @@ class LiRobot(gym.Env):
     }
 
     def __init__(self, size):
+        # choose the the map based on the input size
         if size == 4:
             self.world = param.ENV_SETTINGS.FOUR_BY_FOUR
         else:
             # self.world = self.generate_ten_by_ten()
             self.world = param.ENV_SETTINGS.TEN_BY_TEN
+
+        # initialize the observation space, action_space, agent's position and viewer of the render
         self.observation_space = self.world
         self.action_space = param.AGENT_ACTION.ACTION_SPACE
         self.agent_pos = [1, 1]
         self.viewer = None
 
     def step(self, action_index):
-        pre_pos = self.agent_pos
+        '''
+        :param action_index: the index of the action in the action space
+        :return done: if the episode is finished
+                self.agent_pos: robot's position
+                reward: 0, -1, 1
+        '''
+
+        # let robot take action and move to the next state
         self.agent_pos[0] += param.AGENT_ACTION.ACTION_SPACE[action_index][0]
         self.agent_pos[1] += param.AGENT_ACTION.ACTION_SPACE[action_index][1]
+
+        # if the robot hit the wall, go back to the original position and reselect an action
         if self.observation_space[self.agent_pos[0], self.agent_pos[1]] == -2:
             self.agent_pos[0] -= param.AGENT_ACTION.ACTION_SPACE[action_index][0]
             self.agent_pos[1] -= param.AGENT_ACTION.ACTION_SPACE[action_index][1]
             reward = 0
             done = False
             return done, self.agent_pos, reward
+
+        # if the robot fell into the trap or find the goal, terminate the current episode
         if self.observation_space[self.agent_pos[0], self.agent_pos[1]] == 1 or \
                 self.observation_space[self.agent_pos[0], self.agent_pos[1]] == -1:
             reward = self.observation_space[self.agent_pos[0], self.agent_pos[1]]
             done = True
             return done, self.agent_pos, reward
+        # if there is no trap / wall / goal, keep moving
         else:
             done = False
             reward = param.AGENT_ACTION.ACTION_REWARD
             return done, self.agent_pos, reward
 
+    # reset the position and viewer
     def reset(self):
         self.agent_pos = [1, 1]
         self.viewer = None
         return self.observation_space, self.agent_pos
 
+    # generate a randomly distributed map with the obstacle rate of 0.25
+    # this part can be called when the line 21 is activated, but currently it is blocked
     def generate_ten_by_ten(self):
 
         def connected_check(map):
+            '''
+            :param map: a 10*10 size map
+            :return: a boolean value which indicate the connectivity of the current map
+            '''
             sys.setrecursionlimit(1000000)
-            '''returns a list of tuples of connected squares to the given tile
-            this is memoized with a dict'''
+            # returns a list of tuples of connected squares to the given tile
+            # this is memoized with a dict
             visited = set()
-            # x_limit, y_limit = map.shape[0] - 1, map.shape[1] - 1
             work_list = [(10, 10)]
             while len(work_list) > 0:
                 (i, j) = work_list.pop()
@@ -74,17 +95,22 @@ class LiRobot(gym.Env):
             else:
                 return False
 
+        # build a wall
         for i in range(0, 12):
             for j in range(0, 12):
                 if (i == 0 or i == 11) or (j == 0 or j == 11):
-                    param.ENV_SETTINGS.TEN_BY_TEN_TEST[i][j] = -1
+                    param.ENV_SETTINGS.TEN_BY_TEN_TEST[i][j] = -2
 
         connected = False
+
+        # continuing generating the map until there is at least one route between start point and goal
         while not connected:
             for i in range(1, 11):
                 for j in range(1, 11):
                     param.ENV_SETTINGS.TEN_BY_TEN_TEST[i][j] = 0
             i = 0
+
+            # randomly put the obstacles
             while i < 25:
                 cord_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
                 x = np.random.choice(cord_list, 1).item()
@@ -100,14 +126,22 @@ class LiRobot(gym.Env):
 
         return param.ENV_SETTINGS.TEN_BY_TEN_TEST
 
-    def render_10(self, x, y, mode='human'):  # 可视化画图
+    # render the route in the 10*10 map
+    def render_10(self, x, y, mode='human'):
+
+        # determine the size of the window
         screen_width = 600
         screen_height = 600
+
+        # determine the length of each block's edge
         square_edge = 50
+
         if self.viewer is None:
-            self.viewer = rendering.Viewer(screen_width, screen_height)  # 调用rendering中的画图函数，#创建600*600的窗口
-            # 创建网格世界，一共包括10条直线，事先算好每条直线的起点和终点坐标，然后绘制这些直线，代码如下：
-            # 创建网格世界
+
+            # create the window
+            self.viewer = rendering.Viewer(screen_width, screen_height)
+
+            # use line to create the world
             self.line1 = rendering.Line((50, 50), (550, 50))
             self.line2 = rendering.Line((50, 100), (550, 100))
             self.line3 = rendering.Line((50, 150), (550, 150))
@@ -132,7 +166,7 @@ class LiRobot(gym.Env):
             self.line21 = rendering.Line((500, 50), (500, 550))
             self.line22 = rendering.Line((550, 50), (550, 550))
 
-            # 创建完之后，给11条直线设置颜色，并将这些创建的对象添加到几何中代码如下：
+            # set the color of lines (black)
             self.line1.set_color(0, 0, 0)
             self.line2.set_color(0, 0, 0)
             self.line3.set_color(0, 0, 0)
@@ -375,7 +409,7 @@ class LiRobot(gym.Env):
             self.robot.add_attr(self.offset)
             self.robot.set_color(1, 0, 0)
 
-            # 添加组件到Viewer中
+            # add components to the viewer
             self.viewer.add_geom(self.line1)
             self.viewer.add_geom(self.line2)
             self.viewer.add_geom(self.line3)
@@ -427,7 +461,7 @@ class LiRobot(gym.Env):
             self.viewer.add_geom(self.robot)
             self.viewer.add_geom(self.goal)
         else:
-            # 创建机器人
+            # update the robot's position
             self.robot = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
                                                        (square_edge / 2, -square_edge / 2),
                                                        (square_edge / 2, square_edge / 2),
@@ -439,15 +473,22 @@ class LiRobot(gym.Env):
 
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
+    # render the route in the 4*4 map
     def render_4(self, x, y, mode='human'):
+
+        # determine the size of the window
         screen_width = 600
         screen_height = 600
+
+        # determine the length of each block's edge
         square_edge = 100
 
         if self.viewer is None:
-            self.viewer = rendering.Viewer(screen_width, screen_height)  # 调用rendering中的画图函数，#创建600*600的窗口
-            # 创建网格世界，一共包括10条直线，事先算好每条直线的起点和终点坐标，然后绘制这些直线，代码如下：
-            # 创建网格世界
+
+            # create the window
+            self.viewer = rendering.Viewer(screen_width, screen_height)
+
+            # use line to create the world
             self.line1 = rendering.Line((100, 100), (500, 100))
             self.line2 = rendering.Line((100, 200), (500, 200))
             self.line3 = rendering.Line((100, 300), (500, 300))
@@ -459,7 +500,7 @@ class LiRobot(gym.Env):
             self.line9 = rendering.Line((400, 100), (400, 500))
             self.line10 = rendering.Line((500, 100), (500, 500))
 
-            # set the color of lines
+            # set the color of lines (black)
             self.line1.set_color(0, 0, 0)
             self.line2.set_color(0, 0, 0)
             self.line3.set_color(0, 0, 0)
@@ -541,7 +582,8 @@ class LiRobot(gym.Env):
             self.viewer.add_geom(self.robot)
             self.viewer.add_geom(self.goal)
         else:
-            # 创建机器人
+
+            # update the robot's position
             self.robot = rendering.FilledPolygon([(-square_edge / 2, -square_edge / 2),
                                                   (square_edge / 2, -square_edge / 2),
                                                   (square_edge / 2, square_edge / 2),

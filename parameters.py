@@ -26,16 +26,16 @@ class ENV_SETTINGS:
     # MATRIX_SIZE              = 12                                            # walls + map size
     # MATRIX_SIZE_SHOW         = 6
     # the max walls + map size is 12
-    VALUE_ARRAY              = np.zeros((12, 12))
+    # VALUE_ARRAY              = np.zeros((12, 12))
     STATE_ACTION_VALUE       = np.zeros((12, 12, 4))
 
 
 class AGENT_ACTION:
     ACTION_SPACE             = [[0, 1], [1, 0], [0, -1], [-1, 0]]              # East, South, West, North
-    ACTION_PROB_INT          = 0.25
-    DISCOUNT_FACTOR          = 0.9
+    ACTION_PROB_INT          = 0.25                                            # initial probability for each direction in each state
+    DISCOUNT_FACTOR          = 0.9                                             # GAMMA
     EPSILON                  = 0.1
-    L_RATE                   = 0.02
+    L_RATE                   = 0.02                                            # Learning rate
 
     ACTION_REWARD            = 0.02                                            # ACTION_REWARD is actually useless here,
                                                                                # just to avoid hit the wall.

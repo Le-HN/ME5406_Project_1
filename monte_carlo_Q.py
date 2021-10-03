@@ -30,6 +30,7 @@ def monte_carlo_q(map_size, iteration_lim):
         robot_li = agent.robot_size_4()
         env = lr.LiRobot(size=4)
 
+    # the original map size plus the walls on two sides
     map_plus_wall_size = map_size + 2
 
     # to save the return G of each state-action
@@ -39,9 +40,11 @@ def monte_carlo_q(map_size, iteration_lim):
 
         if (iteration + 1) % 100 == 0:
             print("Training episode: ", iteration + 1)
+
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
+
         # initialize parameters
         G = 0
         reward = 0
@@ -96,18 +99,6 @@ def monte_carlo_q(map_size, iteration_lim):
                     if not return_saving[i][j][k] == 0:
                         robot_li.value_Q[i][j][k] = return_saving[i][j][k] / robot_li.sample_num_Q[i][j][k]
 
-        # print the route to debug
-        # for pos in robot_li.sample_list:
-        #     if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
-        #         env.render_4(pos[0], pos[1])
-        #         time.sleep(0.01)
-        # env.viewer.close()
-        # if episode % 1000 == 0:
-        #     print(episode)
-        # print(robot_li.action_list)
-        # print(return_saving)
-        # print(robot_li.sample_num)
-
         # control
         for i in range(1, map_plus_wall_size - 1):
             for j in range(1, map_plus_wall_size - 1):
@@ -115,6 +106,7 @@ def monte_carlo_q(map_size, iteration_lim):
                                    robot_li.value_Q[i][j][1],
                                    robot_li.value_Q[i][j][2],
                                    robot_li.value_Q[i][j][3]]
+
                 # if the robot will hit the wall after the action,
                 # the q value of this action under this state will be -10
                 # so that it will not be choose
@@ -150,12 +142,6 @@ def monte_carlo_q(map_size, iteration_lim):
             average_q_value_list.append(average_q_value / q_value_counter)
             average_q_value = 0
             q_value_counter = 0
-
-        # np.set_printoptions(linewidth=400)
-        # for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-        #     print(param.ENV_SETTINGS.STATE_ACTION_VALUE[i])
-
-    # print(env.world)
 
     # test
     # to find a route from start point to the destination
@@ -195,8 +181,10 @@ def monte_carlo_q(map_size, iteration_lim):
     if env.world[x][y] != 1:
         success = False
 
+    # print the world
     print(env.world)
 
+    # print the result
     if success:
         print(route)
         print("Monte Carlo Q: ", success)
@@ -206,6 +194,7 @@ def monte_carlo_q(map_size, iteration_lim):
     return episode_list, average_reward_list, average_q_value_list, env.world, route, env, success
 
 
+# calculate the number of success / failure at particular training iteration and map size
 def successful_times_test():
     test_iteration = 100
     successful_num = 0
@@ -217,6 +206,7 @@ def successful_times_test():
     successful_list = [successful_num]
     failed_list = [failed_num]
 
+    # plot the bar chart
     bar_width = 0.8
     bar_label = ("success", "failure")
     successful_index = 1
@@ -239,8 +229,10 @@ if __name__ == '__main__':
         # count times of success then plot
         successful_times_test()
     else:
+        # run for the illustration
         e_list, ar_list, ar_q_list, world, route, env, result = monte_carlo_q(map_size=4, iteration_lim=100)
 
+        # plot the average reward
         plt.plot(e_list, ar_list, label="Monte Carlo Q")
         plt.xlabel("Episode")
         plt.ylabel("Average Reward")
@@ -248,6 +240,7 @@ if __name__ == '__main__':
         plt.legend()
         plt.show()
 
+        # plot the average q value
         plt.plot(e_list, ar_q_list, label="Monte Carlo Q")
         plt.xlabel("Episode")
         plt.ylabel("Average Q Value")
@@ -255,6 +248,7 @@ if __name__ == '__main__':
         plt.legend()
         plt.show()
 
+        # if success, render the route
         if result:
             for pos in route:
                 if pos != (map_plus_wall_size - 2, map_plus_wall_size - 2):
