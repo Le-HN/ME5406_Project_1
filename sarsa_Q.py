@@ -1,13 +1,12 @@
 import env_for_p1.envs.lirobot as lr
 import matplotlib.pyplot as plt
-import tkinter.messagebox
 import parameters as param
 import numpy as np
 import agent
 import time
 
 
-def sarsa_q(iteration_lim):
+def sarsa_q(map_size, iteration_lim):
     # variables to store the statics for plot
     average_q_value_list = []
     average_q_value = 0
@@ -16,11 +15,21 @@ def sarsa_q(iteration_lim):
     average_reward = 0
     episode_list = []
     episode = 0
-    # Instantiate the robot and environment
-    robot_li = agent.robot_size_4()
-    env = lr.LiRobot(size=4)
+
+    # instantiate the robot and environment
+    if map_size == 10:
+        robot_li = agent.robot()
+        env = lr.LiRobot(size=10)
+    elif map_size == 4:
+        robot_li = agent.robot_size_4()
+        env = lr.LiRobot(size=4)
+
+    map_plus_wall_size = map_size + 2
 
     for iteration in range(0, iteration_lim):
+
+        if (iteration + 1) % 100 == 0:
+            print("Training episode: ", iteration + 1)
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
@@ -35,8 +44,8 @@ def sarsa_q(iteration_lim):
         # pre_pos = [1, 1]
         while not done:
             # control
-            for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-                for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
+            for i in range(1, map_plus_wall_size - 1):
+                for j in range(1, map_plus_wall_size - 1):
                     next_value_list = [robot_li.value_Q[i][j][0],
                                        robot_li.value_Q[i][j][1],
                                        robot_li.value_Q[i][j][2],
@@ -82,7 +91,6 @@ def sarsa_q(iteration_lim):
             valid_action = False
             while (not valid_action) and (reward == 0):
                 action_value = np.random.choice(robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]], 1, p=robot_li.probs[robot_li.pos[0]][robot_li.pos[1]]).item()
-                # action_value = max(robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]])
                 for k in range(0, 4):
                     if action_value == robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]][k]:
                         current_action_index = k
@@ -96,7 +104,6 @@ def sarsa_q(iteration_lim):
             if reward == 1 or reward == -1:
                 action_value = 0
 
-            # action_value = robot_li.value_Q[robot_li.pos[0]][robot_li.pos[1]][current_action_index]
             robot_li.value_Q[x][y][index] += param.AGENT_ACTION.L_RATE * (reward +
                                                                           param.AGENT_ACTION.DISCOUNT_FACTOR * action_value -
                                                                           robot_li.value_Q[x][y][index])
@@ -114,8 +121,8 @@ def sarsa_q(iteration_lim):
         # print(robot_li.sample_num)
 
         # calculate the value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
+        for i in range(0, map_plus_wall_size):
+            for j in range(0, map_plus_wall_size):
                 for k in range(0, 4):
                     param.ENV_SETTINGS.STATE_ACTION_VALUE[i][j][k] = robot_li.value_Q[i][j][k]
                     if robot_li.value_Q[i][j][k] != -10 and episode % 20 == 0:
@@ -151,12 +158,15 @@ def sarsa_q(iteration_lim):
         y += param.AGENT_ACTION.ACTION_SPACE[direction][1]
 
         sum += 1
-        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE - 2, 2):
+        if sum > pow(map_plus_wall_size - 2, 2):
             success = False
             break
-    route.append((param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2))
+    route.append((map_plus_wall_size - 2, map_plus_wall_size - 2))
     if env.world[x][y] != 1:
         success = False
+
+    print(env.world)
+
     if success:
         print(route)
         print("SARSA: ", success)
@@ -169,7 +179,7 @@ def successful_times_test():
     test_iteration = 100
     successful_num = 0
     for i in range(0, test_iteration):
-        e_list, ar_list, ar_q_list, world, route, env, result = sarsa_q(iteration_lim=3000)
+        e_list, ar_list, ar_q_list, world, route, env, result = sarsa_q(map_size=10, iteration_lim=3000)
         if result:
             successful_num += 1
     failed_num = test_iteration - successful_num
@@ -192,11 +202,13 @@ def successful_times_test():
 
 if __name__ == '__main__':
 
+    map_plus_wall_size = 12
+
     if param.TEST:
         # count times of success then plot
         successful_times_test()
     else:
-        e_list, ar_list, ar_q_list, world, route, env, result = sarsa_q(iteration_lim=10000)
+        e_list, ar_list, ar_q_list, world, route, env, result = sarsa_q(map_size=10, iteration_lim=10000)
 
         plt.plot(e_list, ar_list, label="SARSA")
         plt.xlabel("Episode")
@@ -214,8 +226,11 @@ if __name__ == '__main__':
 
         if result:
             for pos in route:
-                if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
-                    env.render_10(pos[0], pos[1])
+                if pos != (map_plus_wall_size - 2, map_plus_wall_size - 2):
+                    if map_plus_wall_size - 2 == 10:
+                        env.render_10(pos[0], pos[1])
+                    elif map_plus_wall_size - 2 == 4:
+                        env.render_4(pos[0], pos[1])
                     time.sleep(1)
-        else:
-            tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')
+        # else:
+        #     tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

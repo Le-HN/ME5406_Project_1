@@ -50,6 +50,7 @@ class LiRobot(gym.Env):
         return self.observation_space, self.agent_pos
 
     def generate_ten_by_ten(self):
+
         def connected_check(map):
             sys.setrecursionlimit(1000000)
             '''returns a list of tuples of connected squares to the given tile

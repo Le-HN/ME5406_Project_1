@@ -1,13 +1,12 @@
 import time
 import env_for_p1.envs.lirobot as lr
 import matplotlib.pyplot as plt
-import tkinter.messagebox
 import parameters as param
 import numpy as np
 import agent
 
 
-def q_learning(iteration_lim):
+def q_learning(map_size, iteration_lim):
     # variables to store the statics for plot
     # average q value
     average_q_value_list = []
@@ -23,11 +22,19 @@ def q_learning(iteration_lim):
     episode = 0
 
     # instantiate the robot and environment
-    robot_li = agent.robot_size_4()
-    env = lr.LiRobot(size=4)
+    if map_size == 10:
+        robot_li = agent.robot()
+        env = lr.LiRobot(size=10)
+    elif map_size == 4:
+        robot_li = agent.robot_size_4()
+        env = lr.LiRobot(size=4)
+
+    map_plus_wall_size = map_size + 2
 
     for iteration in range(0, iteration_lim):
 
+        if (iteration + 1) % 100 == 0:
+            print("Training episode: ", iteration + 1)
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
@@ -82,8 +89,8 @@ def q_learning(iteration_lim):
         # print(iteration)
 
         # control
-        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
-            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE - 1):
+        for i in range(1, map_plus_wall_size - 1):
+            for j in range(1, map_plus_wall_size - 1):
                 next_value_list = [robot_li.value_Q[i][j][0],
                                    robot_li.value_Q[i][j][1],
                                    robot_li.value_Q[i][j][2],
@@ -112,8 +119,8 @@ def q_learning(iteration_lim):
                         robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
 
         # save the value to the q table and calculate the average q_value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE):
+        for i in range(0, map_plus_wall_size):
+            for j in range(0, map_plus_wall_size):
                 for k in range(0, 4):
                     param.ENV_SETTINGS.STATE_ACTION_VALUE[i][j][k] = robot_li.value_Q[i][j][k]
                     if robot_li.value_Q[i][j][k] != -10 and episode % 20 == 0:
@@ -158,13 +165,16 @@ def q_learning(iteration_lim):
         sum += 1
 
         # if the number of steps is out of the size of map, stop
-        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE - 2, 2):
+        if sum > pow(map_plus_wall_size - 2, 2):
             success = False
             break
-    route.append((param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2))
+    route.append((map_plus_wall_size - 2, map_plus_wall_size - 2))
     # if the ending is not 1, path finding failed
     if env.world[x][y] != 1:
         success = False
+
+    print(env.world)
+
     if success:
         print(route)
         print("Q_Learning: ", success)
@@ -178,7 +188,7 @@ def successful_times_test():
     test_iteration = 100
     successful_num = 0
     for i in range(0, test_iteration):
-        e_list, ar_list, ar_q_list, world, route, env, result = q_learning(iteration_lim=3000)
+        e_list, ar_list, ar_q_list, world, route, env, result = q_learning(map_size=10, iteration_lim=3000)
         if result:
             successful_num += 1
     failed_num = test_iteration - successful_num
@@ -201,12 +211,13 @@ def successful_times_test():
 
 if __name__ == '__main__':
 
+    map_plus_wall_size = 12
     if param.TEST:
         # count times of success then plot
         successful_times_test()
     else:
         # run for the illustration
-        e_list, ar_list, ar_q_list, world, route, env, result = q_learning(iteration_lim=10000)
+        e_list, ar_list, ar_q_list, world, route, env, result = q_learning(map_size=map_plus_wall_size-2, iteration_lim=1000)
 
         # plot the average reward
         plt.plot(e_list, ar_list, label="Q-Learning")
@@ -227,9 +238,12 @@ if __name__ == '__main__':
         # if success, render the route
         if result:
             for pos in route:
-                if pos != (param.ENV_SETTINGS.MATRIX_SIZE - 2, param.ENV_SETTINGS.MATRIX_SIZE - 2):
-                    env.render_10(pos[0], pos[1])
+                if pos != (map_plus_wall_size - 2, map_plus_wall_size - 2):
+                    if map_plus_wall_size - 2 == 10:
+                        env.render_10(pos[0], pos[1])
+                    elif map_plus_wall_size - 2 == 4:
+                        env.render_4(pos[0], pos[1])
                     time.sleep(1)
         # if not success, show the failed result
-        else:
-            tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')
+        # else:
+        #     tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

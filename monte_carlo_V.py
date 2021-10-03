@@ -1,10 +1,16 @@
 import env_for_p1.envs.lirobot as lr
 import matplotlib.pyplot as plt
-import tkinter.messagebox
 import parameters as param
 import numpy as np
 import time
 import agent
+
+# MONTE_CARLO_V is not available because it used state value rather than state-action value so that its performance
+# is very poor
+# I stopped updating it when the other 3 work quite well, so it won't work properly because there are some variables'
+# name didn't change
+# but I don't want to delete it, cuz it gave the fundamental structure of the other 3 programs
+# although it doesn't work well, I'm still grateful for it
 
 
 def monte_carlo_v(iteration_lim):
@@ -157,5 +163,5 @@ if __name__ == '__main__':
             if pos != (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2):
                 env.render_10(pos[0], pos[1])
                 time.sleep(0.5)
-    else:
-        tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')
+    # else:
+    #     tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

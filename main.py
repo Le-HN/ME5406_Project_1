@@ -1,55 +1,79 @@
 import tkinter as tk
 import tkinter.messagebox
 import os
+import sys
+import getopt
+from q_learning import *
+from sarsa_Q import *
+from monte_carlo_Q import *
 
 
-# 定义一个函数功能（内容自己自由编写），供点击Button按键时调用，调用命令参数command=函数名
-def open_MC_V():
-    tkinter.messagebox.showinfo(title='Note', message='Monte Carlo (state value) will be activated.')
-    os.system("python monte_carlo_V.py")
+def main(argv):
+    algorithm_type = ""
+    map_size = ""
+    training_iteration =""
 
+    try:
+        opts, args = getopt.getopt(argv, "ht:s:i:", ["help", "type=", "size=", "iteration="])
+    except getopt.GetoptError:
+        print('Error: main.py -t <algorithm_type> -s <map_size> -i <training_iteration>')
+        print('   or: main.py --algorithm_type=<algorithm_type> --map_size=<map_size> --training_iteration=<training_iteration>')
+        sys.exit(2)
 
-def open_MC_Q():
-    tkinter.messagebox.showinfo(title='Note', message='Monte Carlo (state-action value) will be activated.')
-    os.system("python monte_carlo_Q.py")
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print('main.py -t <algorithm_type> -s <map_size> -i <training_iteration>')
+            print('or: main.py --algorithm_type=<algorithm_type> --map_size=<map_size> --training_iteration=<training_iteration>')
+            sys.exit()
+        elif opt in ("-t", "--algorithm_type"):
+            algorithm_type = arg
+        elif opt in ("-s", "--map_size"):
+            map_size = arg
+        elif opt in ("-i", "--training_iteration"):
+            training_iteration = arg
+    print('Algorithm type:', algorithm_type)
+    print('Map size:', map_size)
+    print('Training iteration:', training_iteration)
+    print('Training process will be activated.')
 
+    if algorithm_type == "Q_LEARNING":
+        e_l, ar_l, ar_q_l, world, route, env, result = q_learning(map_size=int(map_size), iteration_lim=int(training_iteration))
+    elif algorithm_type == "SARSA":
+        e_l, ar_l, ar_q_l, world, route, env, result = sarsa_q(map_size=int(map_size), iteration_lim=int(training_iteration))
+    elif algorithm_type == "MONTE_CARLO":
+        e_l, ar_l, ar_q_l, world, route, env, result = monte_carlo_q(map_size=int(map_size), iteration_lim=int(training_iteration))
+    else:
+        print("Wrong type!")
+        sys.exit()
 
-def open_SARSA():
-    tkinter.messagebox.showinfo(title='Note', message='SARSA will be activated.')
-    os.system("python sarsa_Q.py")
+    # plot the average reward
+    plt.plot(e_l, ar_l, label=algorithm_type)
+    plt.xlabel("Episode")
+    plt.ylabel("Average Reward")
+    plt.ylim(-1.5, 1.5)
+    plt.legend()
+    plt.show()
 
+    # plot the average q value
+    plt.plot(e_l, ar_q_l, label=algorithm_type)
+    plt.xlabel("Episode")
+    plt.ylabel("Average Q Value")
+    plt.ylim(-0.1, 0.1)
+    plt.legend()
+    plt.show()
 
-def open_QL():
-    tkinter.messagebox.showinfo(title='Note', message='Q Learning will be activated.')
-    os.system("python q_learning.py")
-
+    return result, route, map_size, env
 
 
 if __name__ == "__main__":
-    # 第1步，实例化object，建立窗口window
-    window = tk.Tk()
+    result, route, map_size, env = main(sys.argv[1:])
+    # if success, render the route
+    if result:
+        for pos in route:
+            if pos != (int(map_size), int(map_size)):
+                if int(map_size) == 10:
+                    env.render_10(pos[0], pos[1])
+                elif int(map_size) == 4:
+                    env.render_4(pos[0], pos[1])
+                time.sleep(1)
 
-    # 第2步，给窗口的可视化起名字
-    window.title('Frozen Lake')
-
-    # 第3步，设定窗口的大小(长 * 宽)
-    window.geometry('900x600')  # 这里的乘是小x
-
-    # 第4步，在图形界面上设定标签
-    var = tk.StringVar()  # 将label标签的内容设置为字符类型，用var来接收hit_me函数的传出内容用以显示在标签上
-    l = tk.Label(window, textvariable=var, bg='green', fg='white', font=('Arial', 12), width=30, height=2)
-    # 说明： bg为背景，fg为字体颜色，font为字体，width为长，height为高，这里的长和高是字符的长和高，比如height=2,就是标签有2个字符这么高
-    l.pack()
-
-    # 第5步，在窗口界面设置放置Button按键
-    mcv_b = tk.Button(window, text='Monte Carlo V', font=('Arial', 12), width=14, height=3, command=open_MC_V)
-    mcv_b.pack()
-    mcq_b = tk.Button(window, text='Monte Carlo Q', font=('Arial', 12), width=14, height=3, command=open_MC_Q)
-    mcq_b.pack()
-    sar_b = tk.Button(window, text='SARSA', font=('Arial', 12), width=14, height=3, command=open_SARSA)
-    sar_b.pack()
-    qlr_b = tk.Button(window, text='Q Learning', font=('Arial', 12), width=14, height=3, command=open_QL)
-    qlr_b.pack()
-
-    # 第6步，主窗口循环显示
-    window.mainloop()

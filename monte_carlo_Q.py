@@ -1,13 +1,13 @@
 import env_for_p1.envs.lirobot as lr
 import matplotlib.pyplot as plt
-import tkinter.messagebox
 import parameters as param
 import numpy as np
 import time
 import agent
 
 
-def monte_carlo_q(iteration_lim):
+def monte_carlo_q(map_size, iteration_lim):
+
     # variables to store the statics for plot
     # average q value
     average_q_value_list = []
@@ -23,13 +23,22 @@ def monte_carlo_q(iteration_lim):
     episode = 0
 
     # instantiate the robot and environment
-    robot_li = agent.robot_size_4()
-    env = lr.LiRobot(size=4)
+    if map_size == 10:
+        robot_li = agent.robot()
+        env = lr.LiRobot(size=10)
+    elif map_size == 4:
+        robot_li = agent.robot_size_4()
+        env = lr.LiRobot(size=4)
+
+    map_plus_wall_size = map_size + 2
 
     # to save the return G of each state-action
-    return_saving = np.zeros((param.ENV_SETTINGS.MATRIX_SIZE_SHOW, param.ENV_SETTINGS.MATRIX_SIZE_SHOW, 4))
+    return_saving = np.zeros((map_plus_wall_size, map_plus_wall_size, 4))
 
     for iteration in range(0, iteration_lim):
+
+        if (iteration + 1) % 100 == 0:
+            print("Training episode: ", iteration + 1)
         # prediction
         # robot initialization
         robot_li.obser, robot_li.pos = env.reset()
@@ -81,8 +90,8 @@ def monte_carlo_q(iteration_lim):
             robot_li.sample_num_Q[x][y][robot_li.action_list[j]] += 1
 
         # calculate the expectation of the q value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
+        for i in range(0, map_plus_wall_size):
+            for j in range(0, map_plus_wall_size):
                 for k in range(0, 4):
                     if not return_saving[i][j][k] == 0:
                         robot_li.value_Q[i][j][k] = return_saving[i][j][k] / robot_li.sample_num_Q[i][j][k]
@@ -100,8 +109,8 @@ def monte_carlo_q(iteration_lim):
         # print(robot_li.sample_num)
 
         # control
-        for i in range(1, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 1):
-            for j in range(1, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 1):
+        for i in range(1, map_plus_wall_size - 1):
+            for j in range(1, map_plus_wall_size - 1):
                 next_value_list = [robot_li.value_Q[i][j][0],
                                    robot_li.value_Q[i][j][1],
                                    robot_li.value_Q[i][j][2],
@@ -130,8 +139,8 @@ def monte_carlo_q(iteration_lim):
                         robot_li.probs[i][j][k] = param.AGENT_ACTION.EPSILON / 4
 
         # save the value to the q table and calculate the average q_value
-        for i in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
-            for j in range(0, param.ENV_SETTINGS.MATRIX_SIZE_SHOW):
+        for i in range(0, map_plus_wall_size):
+            for j in range(0, map_plus_wall_size):
                 for k in range(0, 4):
                     param.ENV_SETTINGS.STATE_ACTION_VALUE[i][j][k] = robot_li.value_Q[i][j][k]
                     if robot_li.value_Q[i][j][k] != -10 and episode % 20 == 0:
@@ -177,14 +186,17 @@ def monte_carlo_q(iteration_lim):
         sum += 1
 
         # if the number of steps is out of the size of map, stop
-        if sum > pow(param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, 2):
+        if sum > pow(map_plus_wall_size - 2, 2):
             success = False
             break
-    route.append((param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2))
+    route.append((map_plus_wall_size - 2, map_plus_wall_size - 2))
 
     # if the ending is not 1, path finding failed
     if env.world[x][y] != 1:
         success = False
+
+    print(env.world)
+
     if success:
         print(route)
         print("Monte Carlo Q: ", success)
@@ -198,7 +210,7 @@ def successful_times_test():
     test_iteration = 100
     successful_num = 0
     for i in range(0, test_iteration):
-        e_list, ar_list, ar_q_list, world, route, env, result = monte_carlo_q(iteration_lim=3000)
+        e_list, ar_list, ar_q_list, world, route, env, result = monte_carlo_q(map_size=4, iteration_lim=3000)
         if result:
             successful_num += 1
     failed_num = test_iteration - successful_num
@@ -221,11 +233,13 @@ def successful_times_test():
 
 if __name__ == '__main__':
 
+    map_plus_wall_size = 12
+
     if param.TEST:
         # count times of success then plot
         successful_times_test()
     else:
-        e_list, ar_list, ar_q_list, world, route, env, result = monte_carlo_q(iteration_lim=400000)
+        e_list, ar_list, ar_q_list, world, route, env, result = monte_carlo_q(map_size=4, iteration_lim=100)
 
         plt.plot(e_list, ar_list, label="Monte Carlo Q")
         plt.xlabel("Episode")
@@ -243,8 +257,11 @@ if __name__ == '__main__':
 
         if result:
             for pos in route:
-                if pos != (param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2, param.ENV_SETTINGS.MATRIX_SIZE_SHOW - 2):
-                    env.render_10(pos[0], pos[1])
+                if pos != (map_plus_wall_size - 2, map_plus_wall_size - 2):
+                    if map_plus_wall_size - 2 == 10:
+                        env.render_10(pos[0], pos[1])
+                    elif map_plus_wall_size - 2 == 4:
+                        env.render_4(pos[0], pos[1])
                     time.sleep(1)
-        else:
-            tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')
+        # else:
+        #     tkinter.messagebox.showinfo(title='Note', message='Finding route failed!')

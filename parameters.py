@@ -23,10 +23,11 @@ class ENV_SETTINGS:
                                          [-2,  0,  0,  0,  0,  0,  0, -1,  0,  0,  1, -2],
                                          [-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]])
     TEN_BY_TEN_TEST          = np.zeros((12, 12))
-    MATRIX_SIZE              = 6                                              # walls + map size
-    MATRIX_SIZE_SHOW         = 6
-    VALUE_ARRAY              = np.zeros((MATRIX_SIZE_SHOW, MATRIX_SIZE_SHOW))
-    STATE_ACTION_VALUE = np.zeros((MATRIX_SIZE, MATRIX_SIZE, 4))
+    # MATRIX_SIZE              = 12                                            # walls + map size
+    # MATRIX_SIZE_SHOW         = 6
+    # the max walls + map size is 12
+    VALUE_ARRAY              = np.zeros((12, 12))
+    STATE_ACTION_VALUE       = np.zeros((12, 12, 4))
 
 
 class AGENT_ACTION:
@@ -43,4 +44,4 @@ class AGENT_ACTION:
 
 
 # to calculate the number of success and failure
-TEST = True
+TEST = False
