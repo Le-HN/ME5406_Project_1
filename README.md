@@ -19,6 +19,36 @@ Q-learning with an epsilon-greedy behavior policy.
 
 ### Performances of the algorithms
 
+### Monte-Carlo
+4*4 map
+
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/MC_Q_4.png)
+
+10*10 map
+
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/MC_Q_10.png)
+
+### SARSA
+4*4 map
+
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/SARSA_4.png)
+
+10*10 map
+
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/SARSA_10.png)
+
+### Q-Learning
+4*4 map
+
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/Q_LEARNING_4.png)
+
+10*10 map
+
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/Q_LEARNING_10.png)
+
+### Comparison
+
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/COMP.png)
 
 ### Steps of running the code:
 
