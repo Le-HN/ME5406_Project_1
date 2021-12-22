@@ -15,6 +15,8 @@ In this project, three basic RL methods will be used on both maps, which are fir
 Monte Carlo control without exploring starts, SARSA with an epsilon-greedy behavior policy and
 Q-learning with an epsilon-greedy behavior policy.
 
+![image](https://github.com/Le-HN/ME5406_Project_1/blob/main/README_images/ILLUSTRATION.png)
+
 ### Performances of the algorithms
 
 
