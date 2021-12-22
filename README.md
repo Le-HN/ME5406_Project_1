@@ -106,3 +106,11 @@ It means using Q_LEARNING in 4*4 map at training iteration 500.
 After training, the plot of average reward, average q value will be shown.
 
 If the training is successful, The route will also be shown.
+
+### Writing in the end
+
+This project is built up from zero by myself. Although some codes seem so redundant and stupid, I still hope
+it will help you. Another thing is that my senior schoolmate Zhang Yifeng has helped me a lot and his code, which is totally 
+different from mine, is much more elegant. Here is his Github home page: https://github.com/zhangyifengdavid .
+
+If you think this repository helps you, please give me a star!
